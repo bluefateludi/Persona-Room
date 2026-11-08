@@ -19,11 +19,13 @@ try {
  scene.add(new THREE.HemisphereLight(0xffffff,0x34484b,2.5));const key=new THREE.DirectionalLight(0xffffff,4);key.position.set(4,6,3);scene.add(key);
  const camera=new THREE.PerspectiveCamera(35,650/620,0.01,100);camera.position.set(3,1.7,5);
  const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.2,0);controls.update();
- const start=performance.now();const gltf=await new GLTFLoader().loadAsync(character.model.url);
+ const cabinet = new URLSearchParams(location.search).get('model') === 'cabinet';
+ const modelUrl = cabinet ? '/content/assets/shu/rice-archive-cabinet.glb' : character.model.url;
+ const start=performance.now();const gltf=await new GLTFLoader().loadAsync(modelUrl);
  const box=new THREE.Box3().setFromObject(gltf.scene);const size=box.getSize(new THREE.Vector3());const center=box.getCenter(new THREE.Vector3());
  const meshes:any[]=[];gltf.scene.traverse(o=>{if((o as any).isMesh){const m=o as THREE.Mesh;const material=m.material as THREE.MeshStandardMaterial;meshes.push({vertices:m.geometry.attributes.position.count,triangles:(m.geometry.index?.count??m.geometry.attributes.position.count)/3,texture:!!material.map});}});
  gltf.scene.position.sub(center);gltf.scene.position.y+=size.y/2;const group=new THREE.Group();group.add(gltf.scene);group.scale.setScalar(2.5/size.y);scene.add(group);
- renderer.setAnimationLoop(()=>renderer.render(scene,camera));report.glb={loadMs:Math.round(performance.now()-start),bounds:size.toArray(),meshes};show();
+ renderer.setAnimationLoop(()=>renderer.render(scene,camera));report.glb={modelUrl,loadMs:Math.round(performance.now()-start),bounds:size.toArray(),meshes};show();
 } catch(error) { report.glbError=String(error);show(); }
 try {
  const ctx=new AudioContext({sampleRate:44100});const bytes=await fetch(character.voices[0].audioUrl).then(r=>r.arrayBuffer());const buffer=await ctx.decodeAudioData(bytes);

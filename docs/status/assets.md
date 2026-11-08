@@ -55,3 +55,12 @@
 - 用户明确要求获取替代报价；新报价仍为 45 积分，同一张 PNG、v3.0 高质、贴图、PBR、私有 GLB。
 - 新报价仅提交一次，成功创建任务 73fe37c657534598b1fc5ffba89bb0a0，初始状态 queued，actual_points=45。
 - 原“无法继续提交”结论已过时。后续只查询这个新任务；内部状态存 assets/shu/generation-state.json，不公开部署。
+
+## 档案柜 GLB 已完成并验证（2026-11-08）
+- 模型：https://www.hi3d.ai/3d-model/73fe37c657534598b1fc5ffba89bb0a0 。生成成功，45 积分，余额 1020；禁止重复生成。
+- 本地 assets/shu/rice-archive-cabinet.glb，48,211,572 字节，1 网格、1 材质、2 张内嵌 JPEG、1,968,034 三角面；SHA256 与边界见 assets/shu/validation/report.json。
+- archive-desk.modelUrl 已配置 /content/assets/shu/rice-archive-cabinet.glb；发布脚本白名单增至 10 项，import-data 重新运行仍保留模型绑定。
+- Chromium 独立渲染通过；使用 codex/scene 3bb5ab9 的源码只读启动隔离集成预览，确认真实新模型加载，并实际点击三维柜门打开档案面板。集成控制台 0 errors，1 条已知 Spine/Pixi 弃用警告。
+- 证据：validation/cabinet-preview.png、cabinet-in-gallery.png、cabinet-archive-click.png。未修改或合并场景工作树，场景线可合入本次素材提交。
+- 模型仍为高面数原始资产：手办与柜体合计约 97 MB、395 万三角面，低端设备性能与公网加载仍需按部署目标评估；不声称完成模型减面优化。
+- 本线必需素材交付完成；未发布、未 push、未合并 main。

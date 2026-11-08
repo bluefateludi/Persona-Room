@@ -5,7 +5,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const files = [
  'shu-figurine.glb', 'shu-figurine-concept.png', 'shu-reference.png',
  'spine/build_char_2025_shu.skel', 'spine/build_char_2025_shu.atlas', 'spine/build_char_2025_shu.png',
- 'voice/CN_001.wav',
+ 'voice/CN_001.wav', 'rice-archive-cabinet.glb',
 ];
 export const publicFiles = files.map(name => `assets/shu/${name}`);
 export async function prepareAssets() {

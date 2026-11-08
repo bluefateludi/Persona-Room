@@ -36,6 +36,7 @@ const furniture=[
  ['voice-station','voice','听她说话',[3,0,-2],'shu-assistant'],
  ['art-frame','art','角色画廊',[0,1.8,-4],'shu-art'],
 ].map(([id,kind,label,position,contentId])=>({id,kind,label,position,rotation:[0,0,0],scale:[1,1,1],contentId}));
+furniture.find(item=>item.id==='archive-desk').modelUrl=prefix+'rice-archive-cabinet.glb';
 await fs.writeFile('content/characters/shu.json',JSON.stringify(character,null,2)+'\n');
 await fs.writeFile('content/exhibitions/shu.json',JSON.stringify({schemaVersion:1,id:'shu-gallery',characterId:'shu',title:'黍 · 百谷长青',furniture},null,2)+'\n');
 console.log('Generated curated character and exhibition content');
