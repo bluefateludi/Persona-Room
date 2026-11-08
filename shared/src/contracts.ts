@@ -27,6 +27,10 @@ export interface GallerySceneProps {
 }
 export interface GalleryUIProps extends GallerySceneProps {
   isWalking?: boolean;
+  onOverlayChange?: (open: boolean) => void;
+  onVisit?: (id: string) => void;
+  onResetView?: () => void;
+  onShowHelp?: () => void;
   onLayoutChange: (overrides: FurnitureOverrides) => void;
 }
 export interface SpineActorProps { source: SpineAsset; onInteract?: () => void; className?: string; moving?: boolean; facing?: 'left' | 'right' }

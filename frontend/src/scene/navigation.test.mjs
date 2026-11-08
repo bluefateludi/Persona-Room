@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clearSegment, findPath, getObstacles, isWalkable, nearestWalkable, pathToExhibit } from './navigation.ts';
+import { clearSegment, findPath, getObstacles, isWalkable, nearestWalkable, pathToExhibit, nearbyExhibit } from './navigation.ts';
 const exhibit = (id, kind, position, scale = [1, 1, 1]) => ({ id, kind, position, scale, rotation: [0, 0, 0], label: id });
 const figure = exhibit('figure', 'model', [0, 0, 0]);
 const archive = exhibit('archive', 'archive', [-3, 0, -2]);
@@ -43,4 +43,20 @@ test('segment checks prevent diagonal corner cutting', () => {
   assert.ok(isWalkable([-1.01, 0], blocker));
   assert.ok(isWalkable([0, 1.01], blocker));
   assert.equal(clearSegment([-1.01, 0], [0, 1.01], blocker), false);
+});
+
+test('interaction is available at arrival, not from across the room or inside furniture', () => {
+  const items = [figure, archive];
+  const path = pathToExhibit([3, 2], archive, {}, obstacles);
+  assert.equal(nearbyExhibit(path.at(-1), items, {}, archive.id)?.id, archive.id);
+  assert.equal(nearbyExhibit([6, 3], items, {}, archive.id), null);
+  assert.equal(nearbyExhibit([0, 0], items, {}, figure.id), null);
+});
+test('moving furniture removes interaction at its previous location', () => {
+  const point = pathToExhibit([3, 2], archive, {}, getObstacles([archive], {})).at(-1);
+  assert.equal(nearbyExhibit(point, [archive], {})?.id, archive.id);
+  const overrides = { archive: { position: [4, 0, 2], rotation: [0, 0, 0] } };
+  assert.equal(nearbyExhibit(point, [archive], overrides, archive.id), null);
+  const path = pathToExhibit([0, 3], archive, overrides, getObstacles([archive], overrides));
+  assert.equal(nearbyExhibit(path.at(-1), [archive], overrides)?.id, archive.id);
 });

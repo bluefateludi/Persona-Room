@@ -28,3 +28,22 @@ frontend/node_modules/.bin/tsc.cmd --noEmit --jsx react-jsx --target ES2022 --mo
 7. 1280×720 桌面与 390×844 手机截图检查；手机面板边界不超出视口、不遮挡底部导航；Escape 关闭。
 
 正式集成后仍需使用真实内容包检查场景点击、小人语音和部署 base URL。播放器必须由 GalleryUI 唯一持有。
+
+
+## 游戏式界面更新
+
+上文记录的是旧入口的历史验收；当前正式界面从场景家具或「展馆 → 设置 → 展厅导览」进入内容。收藏、布展及设置收进角落菜单，没有常驻底部导航。
+
+本轮使用真实内容包验证：
+
+- 接近档案柜只显示操作签牌，点击或按 E 后才显示卷册；Esc 关闭后可再次互动。
+- 档案章节、收藏和文库链接保持可用。
+- 语音对话框使用真实普通话音频，验证播放、暂停、继续、静音及浮层操作不移动角色。
+- 桌面与 390×844 手机视口检查；手机卷册可滚动，语音对话框不超出视口；Tab 焦点保持在打开的浮层内。
+- 布展验证移动和旋转、JSON 导出／导入、刷新后恢复；测试后还原原布局。竖屏默认取景已检查小人的点击区域完整可见。
+- 寻路测试新增附近互动范围和布局变化后旧位置失效校验；和存档测试合计 11 项。
+
+```powershell
+node --experimental-strip-types --test frontend/src/scene/navigation.test.mjs frontend/src/features/__tests__/storage.test.mjs
+npm --prefix frontend run build
+```

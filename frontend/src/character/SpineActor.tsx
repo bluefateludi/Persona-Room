@@ -25,7 +25,7 @@ export function SpineActor({ source, onInteract, className, moving = false, faci
     <button type="button" aria-label="与黍互动" disabled={state !== 'ready'}
       onClick={() => { playback.current?.interact(); onInteract?.(); }}
       style={{ position: 'absolute', inset: 0, background: 'transparent', border: 0, cursor: state === 'ready' ? 'pointer' : 'default', color: 'inherit' }}>
-      {state === 'loading' ? '正在加载动态小人…' : state === 'ready' ? <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{moving ? '散步中 · 点击打招呼' : '点击与黍互动'}</span> : null}
+      {state === 'loading' ? '正在加载动态小人…' : state === 'ready' ? <span className="companion-caption" style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>{moving ? '散步中 · 点击打招呼' : '点击与黍互动'}</span> : null}
     </button>
     {state !== 'ready' && state !== 'loading' && <div role="status" style={{ position: 'relative', padding: 16 }}>
       <p>动态小人暂不可用：{state}</p><button type="button" onClick={() => setAttempt(n => n + 1)}>重试加载</button>

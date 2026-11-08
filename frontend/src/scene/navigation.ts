@@ -98,3 +98,13 @@ export function pathToExhibit(start: Point, item: FurnitureItem, overrides: Furn
   for (const point of candidates) { const path = findPath(start, point, obstacles); if (path) return path; }
   return null;
 }
+
+/** Interaction reach is measured from the footprint edge, not the model's origin. */
+export function nearbyExhibit(point: Point, items: FurnitureItem[], overrides: FurnitureOverrides, preferredId?: string): FurnitureItem | null {
+  if (!isWalkable(point, getObstacles(items, overrides))) return null;
+  const nearby = items.filter(item => item.kind !== 'companion').map(item => {
+    const obstacle = furnitureObstacle(item, overrides);
+    return { item, gap: distance(point, obstacle.center) - obstacle.radius };
+  }).filter(candidate => candidate.gap >= 0 && candidate.gap <= 0.8).sort((a, b) => a.gap - b.gap);
+  return nearby.find(candidate => candidate.item.id === preferredId)?.item ?? nearby[0]?.item ?? null;
+}

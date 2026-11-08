@@ -57,7 +57,7 @@ export function CompanionProjection({ position, route, element, onArrive, onFaci
     host.style.visibility = screen.z > 1 || screen.z < -1 ? "hidden" : "visible";
     host.style.left = `${(screen.x * 0.5 + 0.5) * size.width}px`;
     host.style.top = `${(-screen.y * 0.5 + 0.5) * size.height}px`;
-    host.style.transform = `translate(-50%, -94%) scale(${Math.min(1.8, 6 / world.distanceTo(camera.position))})`;
+    host.style.transform = `translate(-50%, -94%) scale(${Math.min(1.8, Math.max(0.34, 6 / world.distanceTo(camera.position)))})`;
   });
   return <mesh ref={shadow} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.65, 1]} raycast={() => {}}>
     <circleGeometry args={[0.3, 32]} />

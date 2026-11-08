@@ -14,11 +14,13 @@ import type {
 import { SceneLabel } from "./SceneLabel";
 import { Figurine } from "../character/Figurine";
 import { Box, Furniture } from "../furniture/Furniture";
-import { findPath, getObstacles, nearestWalkable, pathToExhibit, type Point } from "./navigation";
+import { findPath, getObstacles, nearestWalkable, pathToExhibit, nearbyExhibit, type Point } from "./navigation";
 export interface CompanionMotion { moving: boolean; facing: 'left' | 'right'; onInteract: () => void }
 type SceneProps = GallerySceneProps & {
   companion?: (motion: CompanionMotion) => ReactNode;
   visitRequest?: { id: string; sequence: number };
+  inputBlocked?: boolean;
+  resetRequest?: number;
   onWalkingChange?: (moving: boolean) => void;
 };
 function Room({ onFloorClick }: { onFloorClick: (event: ThreeEvent<MouseEvent>) => void }) {
@@ -91,6 +93,8 @@ function CameraRig({
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const invalidate = useThree((state) => state.invalidate);
+  const aspect = useThree(state => state.size.width / Math.max(state.size.height, 1));
+  const overviewScale = aspect < 0.8 ? 1.8 : aspect < 1.1 ? 1.25 : 1;
   const desired = useRef(new Vector3(8, 6.8, 10));
   const target = useRef(new Vector3(0, 1, 0));
   const moving = useRef(true);
@@ -98,13 +102,13 @@ function CameraRig({
     const p = focused ?? [0, 0, 0];
     target.current.set(p[0], p[1] + 1.3, p[2]);
     desired.current.set(
-      p[0] + (focused ? 1.8 : 8),
-      p[1] + (focused ? 3 : 6.8),
-      p[2] + (focused ? 5 : 10),
+      p[0] + (focused ? 1.8 : 8 * overviewScale),
+      p[1] + (focused ? 3 : 1.3 + 5.5 * overviewScale),
+      p[2] + (focused ? 5 : 10 * overviewScale),
     );
     moving.current = true;
     invalidate();
-  }, [focused?.[0], focused?.[1], focused?.[2], reset]);
+  }, [focused?.[0], focused?.[1], focused?.[2], reset, overviewScale]);
   useFrame(({ camera }, delta) => {
     if (!moving.current || !controls.current) return;
     const t = 1 - Math.exp(-delta * 4);
@@ -121,7 +125,7 @@ function CameraRig({
       makeDefault
       enablePan={false}
       minDistance={3}
-      maxDistance={17}
+      maxDistance={17 * overviewScale}
       minPolarAngle={0.2}
       maxPolarAngle={Math.PI / 2.12}
       onStart={() => {
@@ -212,12 +216,24 @@ export function GalleryScene(props: SceneProps) {
   const position = useRef<Point>([home[0], home[2]]);
   const [route, setRoute] = useState<Point[]>([]);
   const [facing, setFacing] = useState<'left' | 'right'>('right');
-  const [notice, setNotice] = useState('点一处空地，陪黍逛逛展厅');
+  const [notice, setNotice] = useState('');
+  const [nearby, setNearby] = useState<FurnitureItem | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const pending = useRef<Selection>(null);
   const moving = route.length > 0;
   const obstacles = useMemo(() => getObstacles(props.exhibition.furniture, props.furnitureOverrides), [props.exhibition.furniture, props.furnitureOverrides]);
-  const stop = useCallback(() => { pending.current = null; setRoute([]); setNotice('在这里歇一会儿吧'); }, []);
+  const stop = useCallback(() => {
+    pending.current = null; setRoute([]); setNotice('');
+    setNearby(nearbyExhibit(position.current, props.exhibition.furniture, props.furnitureOverrides));
+  }, [props.exhibition.furniture, props.furnitureOverrides]);
+  useEffect(() => { if (props.inputBlocked) stop(); }, [props.inputBlocked, stop]);
+  useEffect(() => { if (props.resetRequest) { stop(); props.onSelect(null); setReset(value => value + 1); } }, [props.resetRequest]);
+  const confirmInteraction = useCallback(() => {
+    if (!nearby || moving || props.inputBlocked) return;
+    const current = nearbyExhibit(position.current, props.exhibition.furniture, props.furnitureOverrides, nearby.id);
+    if (current?.id === nearby.id) props.onSelect({ id: nearby.id, kind: nearby.kind });
+    else setNearby(null);
+  }, [nearby, moving, props.inputBlocked, props.exhibition.furniture, props.furnitureOverrides, props.onSelect]);
   useEffect(() => { props.onWalkingChange?.(moving); }, [moving, props.onWalkingChange]);
   const previousHome = useRef(home.join(','));
   useEffect(() => {
@@ -227,19 +243,26 @@ export function GalleryScene(props: SceneProps) {
     const safe = nearestWalkable(homeChanged ? [home[0], home[2]] : position.current, obstacles);
     if (safe) position.current = safe;
     pending.current = null; setRoute([]);
-    setNotice(safe ? '点一处空地，陪黍逛逛展厅' : '展厅太拥挤了，请先调整家具');
+    setNearby(safe ? nearbyExhibit(safe, props.exhibition.furniture, props.furnitureOverrides) : null);
+    setNotice(safe ? '' : '展厅太拥挤了，请先调整家具');
   }, [obstacles, home[0], home[2]]);
   useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (event.key === 'Escape') stop(); };
+    const key = (event: KeyboardEvent) => {
+      if (props.inputBlocked || event.repeat || (event.target instanceof HTMLElement && (event.target.isContentEditable || ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)))) return;
+      if (event.key === 'Escape') stop();
+      if (event.key.toLowerCase() === 'e' && nearby && !moving) { event.preventDefault(); confirmInteraction(); }
+    };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
-  }, [stop]);
+  }, [stop, props.inputBlocked, nearby, moving, confirmInteraction]);
   const interact = useCallback(() => {
+    if (props.inputBlocked) return;
     stop();
     if (companionItem) props.onSelect({ id: companionItem.id, kind: 'companion' });
-  }, [stop, companionItem, props.onSelect]);
+  }, [stop, companionItem, props.onSelect, props.inputBlocked]);
   const startJourney = useCallback((path: Point[] | null, selection: Selection, label: string) => {
     pending.current = null;
+    setNearby(null);
     if (!path) { setRoute([]); setNotice('这里暂时走不到，换一处空地试试'); return; }
     pending.current = selection;
     props.onSelect(null);
@@ -255,22 +278,22 @@ export function GalleryScene(props: SceneProps) {
   // A request is a user action, not a selected exhibit; repeated visits also work.
   const handledRequest = useRef(0);
   useEffect(() => {
-    if (!props.visitRequest || props.visitRequest.sequence === handledRequest.current) return;
+    if (props.inputBlocked || !props.visitRequest || props.visitRequest.sequence === handledRequest.current) return;
     handledRequest.current = props.visitRequest.sequence;
     const item = props.exhibition.furniture.find(item => item.id === props.visitRequest!.id);
     if (item) visit(item);
-  }, [props.visitRequest, props.exhibition.furniture, visit]);
+  }, [props.inputBlocked, props.visitRequest, props.exhibition.furniture, visit]);
   useEffect(() => { if (props.selection) { pending.current = null; setRoute([]); } }, [props.selection]);
   function arrive() {
     const selection = pending.current;
     pending.current = null; setRoute([]);
-    setNotice(selection ? '到了，一起看看吧' : '还想去哪里？点点地面吧');
-    if (selection) props.onSelect(selection);
+    setNotice('');
+    setNearby(nearbyExhibit(position.current, props.exhibition.furniture, props.furnitureOverrides, selection?.id));
   }
   function walkTo(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
-    if (event.delta > 5 || !props.character.spine) return;
-    startJourney(findPath(position.current, [event.point.x, event.point.z], obstacles), null, '正在散步 · 可以随时换个目的地');
+    if (event.delta > 5 || props.inputBlocked || !props.character.spine) return;
+    startJourney(findPath(position.current, [event.point.x, event.point.z], obstacles), null, '随你走走');
   }
   const selected = props.exhibition.furniture.find(
     (x) => x.id === props.selection?.id,
@@ -279,8 +302,8 @@ export function GalleryScene(props: SceneProps) {
     ? (selected.kind === "companion" ? [position.current[0], 0, position.current[1]] as Vec3 : props.furnitureOverrides[selected.id]?.position ?? selected.position)
     : null;
   return (
-    <section className={`gallery-scene${moving ? " is-walking" : ""}`} aria-label="三维互动展厅">
-      <SceneBoundary>
+    <section className={`gallery-scene${moving ? " is-walking" : ""}${props.inputBlocked ? " is-blocked" : ""}`} aria-label="三维互动展厅">
+      <SceneBoundary onUnavailable={() => setSceneReady(false)}>
         <Canvas
           frameloop="demand"
           onCreated={() => setSceneReady(true)}
@@ -291,12 +314,12 @@ export function GalleryScene(props: SceneProps) {
           onPointerMissed={() => props.onSelect(null)}
           fallback={
             <div className="webgl-fallback">
-              当前设备暂不支持三维展厅，仍可通过下方目录阅读展品。
+              当前设备暂不支持三维展厅，可通过右上角菜单 → 设置 → 展厅导览阅读展品。
             </div>
           }
         >
           <color attach="background" args={["#162b30"]} />
-          <fog attach="fog" args={["#162b30", 18, 35]} />
+          <fog attach="fog" args={["#162b30", 28, 55]} />
           <ambientLight intensity={1.1} />
           <hemisphereLight args={["#f4ead4", "#243e4c", 1.7]} />
           <directionalLight
@@ -318,7 +341,7 @@ export function GalleryScene(props: SceneProps) {
           />
           <Room onFloorClick={walkTo} />
           {props.exhibition.furniture.filter(item => item.kind !== "companion").map((item) => (
-            <Exhibit key={item.id} item={item} props={props} onVisit={visit} />
+            <Exhibit key={item.id} item={item} props={{ ...props, selection: props.selection ?? (nearby ? { id: nearby.id, kind: nearby.kind } : null) }} onVisit={item => { if (!props.inputBlocked) visit(item); }} />
           ))}
           <ContactShadows
             position={[0, 0.012, 0]}
@@ -341,38 +364,24 @@ export function GalleryScene(props: SceneProps) {
         </div>
       )}
       <LoadingNotice />
-      <div className="scene-controls">
-        <span>
-          <i /> LIVE EXHIBITION
-        </span>
-        <button
-          onClick={() => {
-            stop();
-            props.onSelect(null);
-            setReset((v) => v + 1);
-          }}
-        >
-          ↗ 全馆视角
+      {!props.inputBlocked && <>
+        <button type="button" className="view-reset" aria-label="重置视角" title="重置视角" onClick={() => { stop(); props.onSelect(null); setReset(value => value + 1); }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6" /><path d="M12 8v8m-4-4h8" /></svg>
         </button>
-        <button
-          onClick={() => {
-            const item = props.exhibition.furniture.find(
-              (x) => x.kind === "model",
-            );
-            if (item) { stop(); props.onSelect({ id: item.id, kind: item.kind }); }
-          }}
-        >
-          ⊕ 检视手办
-        </button>
-      </div>
-      <div className="companion-status">
-        <span className={moving ? 'walk-dot active' : 'walk-dot'} aria-hidden="true" />
-        <span role="status" aria-live="polite">{notice}</span>
-        {moving && <button type="button" onClick={stop}>停在这里</button>}
-      </div>
-      <div className="scene-hint">
-        拖动旋转视角 <b>·</b> 滚轮缩放 <b>·</b> 点击地面散步 <b>·</b> 点击展品带路
-      </div>
+        {(moving || notice) && <div className="companion-status">
+          <span className={moving ? 'walk-dot active' : 'walk-dot'} aria-hidden="true" />
+          <span role="status" aria-live="polite">{notice}</span>
+          {moving && <button type="button" onClick={stop}>停在这里</button>}
+        </div>}
+        {nearby && !moving && <div className="interaction-prompt" data-exhibit={nearby.id}>
+          <span className="interaction-caption">{nearby.label}</span>
+          <button type="button" onClick={confirmInteraction}>
+            <span className="action-diamond" aria-hidden="true">◇</span>
+            {{ archive: '阅读档案', voice: '聆听语音', art: '欣赏画作', model: '欣赏手办', companion: '与黍交谈' }[nearby.kind]}
+            <kbd aria-hidden="true">E</kbd>
+          </button>
+        </div>}
+      </>}
     </section>
   );
 }

@@ -36,10 +36,14 @@ export function useVoicePlayer() {
     if (!audio.paused) { audio.pause(); setStatus('paused'); }
     else { const ticket = request.current; try { await audio.play(); } catch { if (ticket === request.current) setStatus('error'); } }
   }, []);
+  const pause = useCallback(() => {
+    const audio = player.current;
+    if (audio && !audio.paused) { audio.pause(); setStatus('paused'); }
+  }, []);
   const toggleMute = useCallback(() => {
     mutedRef.current = !mutedRef.current;
     setMuted(mutedRef.current);
     if (player.current) player.current.muted = mutedRef.current;
   }, []);
-  return { entry, status, muted, play, togglePause, toggleMute };
+  return { entry, status, muted, play, pause, togglePause, toggleMute };
 }
