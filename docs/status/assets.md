@@ -39,3 +39,9 @@
 - get_balance 成功，余额 1065；任务列表仍只有已有手办，无档案柜新任务。
 - 这次实际重发的是查询请求，未重发收费 create_generation。当前工具声明仍为“每份报价只能提交一次”，没有失败报价重置接口。
 - 可确认授权校验错误具有间歇性；不能据查询恢复推断收费端已恢复。
+
+## Codex MCP OAuth 重新授权
+- 现有 hi3d 配置符合用户要求：enabled=true，streamable_http，https://agent.hi3d.ai/mcp；未改动其他设置。
+- codex mcp login hi3d 返回 Successfully logged in to MCP server 'hi3d'，用户已在浏览器完成 OAuth。
+- 授权后 get_account_context 和 get_capabilities 各调用两次（含明确授权重试），全部返回 HTTP 503 AUTH_SERVICE_UNAVAILABLE。
+- 本聊天可见 11 个 Hi3D 工具，但这不代表当前远程调用可用。尚未恢复运行验证，未发新的收费生成请求。
