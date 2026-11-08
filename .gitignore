@@ -1,0 +1,29 @@
+# Local dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local credentials and environment settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Temporary working files
+.scratch/*
+!.scratch/gallery/
+.scratch/gallery/*
+!.scratch/gallery/issues/
+.scratch/gallery/issues/*
+!.scratch/gallery/issues/01-assets.md
+!.scratch/gallery/issues/02-scene.md
+!.scratch/gallery/issues/03-interaction.md
+*.log
+.DS_Store
+Thumbs.db
+
+# Internal asset generation records
+assets/**/generation-state.json
+assets/**/generation-result.json
