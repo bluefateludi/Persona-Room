@@ -33,3 +33,9 @@
 - Hi3D get_capabilities 查询成功；这只能证明查询通道可用，不能证明收费生成通道已恢复。
 - 原素材交接提交 312a54a、5863643 已存在，本轮再次运行 prepare-assets、validate-content、SpineActor TypeScript 检查均通过。
 - 待恢复条件：正常网页控制可用，或 Hi3D 提供已失败报价的有效恢复/重提途径。不要把连接重试记录误写成建模请求已重发。
+
+## 再次 MCP 请求复核（用户明确要求继续请求）
+- list_tasks 首次返回 HTTP 503 AUTH_SERVICE_UNAVAILABLE；按用户授权重试 list_tasks 后成功。
+- get_balance 成功，余额 1065；任务列表仍只有已有手办，无档案柜新任务。
+- 这次实际重发的是查询请求，未重发收费 create_generation。当前工具声明仍为“每份报价只能提交一次”，没有失败报价重置接口。
+- 可确认授权校验错误具有间歇性；不能据查询恢复推断收费端已恢复。
