@@ -1,39 +1,41 @@
-# 场景线状态
+# 场景线与最终集成状态
 
+## 交付
+- 状态：三线实现已集成，完整浏览器参观验收完成；不发布、不 push、不合并 main。
 - 工作树：`C:\Users\86150\.codex\worktrees\gallery-scene\Hi3d-0765`
-- 分支：`codex/scene`；只在此工作树写入，不修改 main。
-- 已建立 React 19 / TypeScript / Vite 7 工程；R3F 9、Drei 10、Three 0.180。
-- 依赖和锁文件由本线唯一维护；素材/交互需求请通过各自状态或提交交接。
-- 正在实现：真实 GLB、程序化家具、镜头切换和 App 装配。
-- 接口遵循 shared/src/contracts.ts，未修改公共契约。
-- 待交接：素材内容包、SpineActor 和 GalleryUI 的完成提交。
+- 分支：`codex/scene`
+- 已合并明确交付提交：交互 `89da211`；素材 `312a54a`。其模块未由本线覆盖；shared 公共契约未修改。
+- React 19 / TypeScript / Vite、Three/R3F/Drei 与 Spine 运行库均已安装并锁定。本线唯一维护 package 与锁文件。
 
-## 第一版切片
-- 已实现真实 GLB 归一化，程序化房间、展示台、档案柜、语音台、画框和小人预留区。
-- 固定家具 ID 触发契约 selection；furnitureOverrides 驱动位置/旋转；镜头聚焦、全馆复位和 OrbitControls 已实现。
-- 页面采用米白、靛蓝、稻金主题；桌面与窄屏均支持展品目录。
-- 验证：`npm run build --prefix frontend` 通过（TypeScript + Vite）；Playwright 已实际渲染 GLB，参考截图 `frontend/output/playwright/scene-initial.png`。
-- 浏览器发现 React StrictMode 与 Drei Html 的同步卸载开发警告，已移除入口 StrictMode，待复测。
-- 已按素材线需求安装 pixi.js 7.4.3、@pixi-spine/runtime-3.8 4.0.6、@pixi-spine/base 4.0.6。
-- 待接入：两线已完成提交。当前 App 明确标为内容包待接入，没有模拟音频或 Spine 完成。
-- 模型实际体积 48.5 MB，首次下载较重；最终内容包可保持本地静态服务运行，不触发生成。
-- 首版可交接提交：`bc1a115`。交互线可在自己的分支合并该提交以取得构建配置与锁文件（依赖内容包待接入），不要复制进行中的文件。
-- 进一步修正：将展品标牌改为 Three 原生纹理精灵，避免 React/Drei 独立 DOM 根的开发卸载警告；显示真实加载进度。
+## 已实现
+- 真实 GLB 归一化、统一主题房间/家具/灯光、点击拾取、选中环、旋转缩放、镜头聚焦与复位。
+- 固定展品 ID 与位置/旋转覆盖；三维标牌消费内容包标签；生成家具支持 modelUrl 与失败时程序化回退。
+- App 装配 GalleryUI 和真实 SpineActor。小人透明画布随家具位置投影，音频只由 GalleryUI 管理；内容解析后才恢复存档。
+- 内容包结构、版本、角色关联、有限坐标与重复 ID 校验；部署 base 前缀统一转换。
+- 异步加载进度、GLB 图片回退/重试、画框缺失提示、独立 WebGL 错误边界；静止场景按需渲染。
+- 响应式标题、展品目录和内容面板；手机标题不覆盖场景；小人资源与主场景拆成独立 bundle。
 
-## 复测与下一步
-- 2026-11-08：正常浏览器加载已达零错误、零警告（React 标牌卸载问题已通过 Three 原生标牌解决）。
-- 已验证 1440px 桌面与 390px 窄屏，模型聚焦可操作；检视时收起页面标题防止遮挡。
-- 浏览器阻断 GLB 请求：显示“模型加载失败 · 当前为图片预览”，其他展品入口可用；恢复网络并点击重试后真实模型恢复。
-- 家具 GLB 按目标高度 1.7 自动归一化；失败时退回程序化档案柜；画框失败显示明确提示。
-- 当前生产构建通过。下一步合并两线交付并验收完整参观、音频与存档。
-- 已预留 GalleryScene 的可选 companion ReactNode 插槽（不修改 shared 契约，原 props 仍兼容），随 shu-companion 的位置覆盖投影透明画布；App 将装配 SpineActor，所有音频仍由 GalleryUI 独占。
-- 场景改为按需渲染：静止时不持续占用 GPU，镜头过渡、用户旋转与布局变化继续刷新。
-- 真实鼠标点击三维档案柜已打开 archive 选择（不是只验证底部导航）；镜头随之聚焦，固定 ID 绑定有效。
-- 当前场景工作已形成可运行切片，等待资产和交互的完成提交后执行合并集成；未因等待而声明完整交付。
+## 验证证据（2026-11-08，香港时间）
+- `npm run build --prefix frontend`：TypeScript + Vite 生产构建通过。
+- `node scripts/prepare-assets.mjs` / `node scripts/validate-content.mjs`：9 项白名单素材、契约引用、GLB 内嵌贴图与 WAV 头通过；内部生成记录不发布。
+- `node --experimental-strip-types --test frontend/src/features/__tests__/storage.test.mjs`：3 项全部通过。
+- Chromium 真实渲染：GLB 与 Spine 同时出现；真实鼠标点击三维档案柜打开 archive；模型检视、家具/画框/语音入口有效。
+- 点击真实小人 → Interact 动作 → 普通话 CN_001 → 对应整条字幕；播放与暂停成功。未声称人工听感评价。
+- 阅读真实档案、切换章节、收藏；刷新后 `archive:profile`、已读 profile/care 及家具覆盖保留。
+- 实际布展后 archive-desk 坐标 (-2.2, 0, -1.2)、Y 旋转 0.9653981633974482；刷新恢复。导出配置、恢复默认、再导入，坐标/收藏/已读一起恢复。
+- 文库链接 `target=_blank`、`rel=noopener noreferrer`；真实新标签页打开「泰拉文库 · 多语言剧情阅读器」，原展馆保留。
+- 1440×900 和 390×844 截图检查；手机内容面板不越界、底部导航可用；Escape 关闭有效。
+- 故障注入：阻断 GLB 显示图片预览，恢复网络后重试成功；禁用 WebGL 后独立错误边界保留阅读/收藏/布展界面。
+- `/gallery/` 生产子路径构建与真实浏览器通过：JSON、GLB、Spine 三件套全部 200，点击小人仍可播放真实语音；GLB 在发布产物中仅一份。
+- 正常完整页面：控制台 0 errors；1 条第三方 Spine/Pixi rgb2hex 弃用警告，未掩盖或抑制。
+- 本机截图：`frontend/output/playwright/production-gallery.png`、`final-mobile-clean.png`、`mobile-editor.png` 等。浏览器日志归档于同目录 session-logs；不作为发布素材。
 
-## 交互线集成
-- 已合并交互完成提交 `89da211`，未修改其模块文件。
-- App 已接入 GalleryUI 与 onLayoutChange；内容解析结束后才挂载存档模块，避免用空档案列表误读有效存档。
-- 实际场景布展：archive-desk 向右、旋转 45° 后即时更新；刷新后仍回显 (-2.2, 0.0, -1.2)，本地 rotation 0.9653981633974482 保留。
-- 构建通过；交互线 3 个存档/安全链接测试全通过。
-- 下一步：正式素材提交合并，SpineActor、真实音频字幕与文库阅读完整浏览器验收。
+## 限制与后续
+- 新档案柜 GLB 尚缺：素材线在已确认报价下提交一次遭遇 503；当前使用程序化档案柜，档案交互完整。没有重复生成。
+- 48.5 MB、约 198 万三角面的原始手办较重；手机尺寸验收不等于真实低端手机性能保证。
+- 仅一条真实语音；文库角色直达页尚未核验，使用首页＋搜索提示。
+- 当前存档是本浏览器保存与 JSON 导入导出，不是云分享或跨设备同步。
+
+## 本地启动
+在本工作树 `frontend` 内执行 `npm ci`、`npm run dev -- --port 5173`。构建 `npm run build`；预览 `npm run preview`。运行与实现说明见 `frontend/README.md`。
+- 收尾发现 Windows Vite 监听备用构建目录中的 GLB 时产生 EBUSY；已在 server.watch 中排除 output 与浏览器日志目录，正式生产包不受影响，开发服务重启后复核。

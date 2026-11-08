@@ -542,3 +542,58 @@ a {
     visibility: hidden;
   }
 }
+.companion-anchor {
+  height: 260px;
+  color: #e8dfcb;
+  font-size: 12px;
+  text-shadow: 0 1px 4px #112c31;
+}
+.companion-loading {
+  display: block;
+  padding: 70px 12px;
+  text-align: center;
+  font-size: 12px;
+}
+.companion-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  transform-origin: center;
+  pointer-events: none;
+  visibility: hidden;
+}
+.companion-anchor {
+  pointer-events: auto;
+}
+.gallery-scene {
+  overflow: hidden;
+}
+@media (max-width: 800px) {
+  .gallery-heading {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    margin: 28px 6% 20px;
+  }
+  .gallery-scene {
+    height: 52vh;
+    min-height: 410px;
+  }
+  .scene-controls,
+  .is-inspecting .scene-controls {
+    top: 28px;
+  }
+  .gallery-app .g-ui-story-trigger {
+    display: none;
+  }
+}
+.companion-anchor button > span {
+  font-size: 11px;
+  color: #eee6d5;
+  background: #213b40c9;
+  padding: 3px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}

@@ -102,30 +102,24 @@ export function Furniture({
   if (item.kind === "art")
     return (
       <group>
-        <Box position={[0, 1.75, 0]} size={[1.7, 2.8, 0.16]} color={gold} />
-        <Box
-          position={[0, 1.75, 0.1]}
-          size={[1.57, 2.67, 0.06]}
-          color={cream}
-        />
+        <Box position={[0, 0, 0]} size={[1.7, 2.8, 0.16]} color={gold} />
+        <Box position={[0, 0, 0.1]} size={[1.57, 2.67, 0.06]} color={cream} />
         {character.artworks[0] && (
           <AssetBoundary
             key={character.artworks[0].imageUrl}
-            fallback={
-              <SceneLabel text="图片暂不可用" position={[0, 1.75, 0.2]} />
-            }
+            fallback={<SceneLabel text="图片暂不可用" position={[0, 0, 0.2]} />}
           >
             <Suspense fallback={null}>
               <Image
                 url={character.artworks[0].imageUrl}
-                position={[0, 1.75, 0.15]}
+                position={[0, 0, 0.15]}
                 scale={[1.43, 2.5]}
                 transparent
               />
             </Suspense>
           </AssetBoundary>
         )}
-        <SceneLabel position={[0, 3.4, 0]} text={item.label} />
+        <SceneLabel position={[0, 1.65, 0]} text={item.label} />
       </group>
     );
   if (item.kind === "companion")

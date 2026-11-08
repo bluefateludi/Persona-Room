@@ -3,8 +3,8 @@ import type {
   CharacterContent,
   ExhibitionContent,
 } from "../../../shared/src/contracts";
-import modelUrl from "../../../assets/shu/shu-figurine.glb?url";
-import posterUrl from "../../../assets/shu/shu-figurine-concept.png?url";
+const modelUrl = publicUrl("/content/assets/shu/shu-figurine.glb");
+const posterUrl = publicUrl("/content/assets/shu/shu-figurine-concept.png");
 export const initialCharacter: CharacterContent = {
   schemaVersion: 1,
   id: "shu",
@@ -63,7 +63,7 @@ export const initialExhibition: ExhibitionContent = {
       id: "art-frame",
       kind: "art",
       label: "丹青留影",
-      position: [2.6, 0, -3.3],
+      position: [2.6, 1.75, -3.3],
       rotation: [0, 0, 0],
       scale: [1, 1, 1],
     },

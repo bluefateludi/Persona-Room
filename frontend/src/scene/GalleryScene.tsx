@@ -1,12 +1,8 @@
+import { CompanionProjection } from "./CompanionProjection";
 import { SceneBoundary } from "./SceneBoundary";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  Html,
-  OrbitControls,
-  ContactShadows,
-  useProgress,
-} from "@react-three/drei";
+import { OrbitControls, ContactShadows, useProgress } from "@react-three/drei";
 import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type {
@@ -178,16 +174,6 @@ function Exhibit({ item, props }: { item: FurnitureItem; props: SceneProps }) {
       ) : (
         <Furniture item={item} character={props.character} />
       )}
-      {item.kind === "companion" && props.companion && (
-        <Html
-          center
-          position={[0, 1.25, 0]}
-          distanceFactor={6}
-          zIndexRange={[10, 0]}
-        >
-          <div className="companion-anchor">{props.companion}</div>
-        </Html>
-      )}
       {(hover || selected) && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
           <ringGeometry
@@ -213,6 +199,7 @@ function LoadingNotice() {
 }
 export function GalleryScene(props: SceneProps) {
   const [reset, setReset] = useState(0);
+  const companionElement = useRef<HTMLDivElement>(null);
   const selected = props.exhibition.furniture.find(
     (x) => x.id === props.selection?.id,
   );
@@ -269,8 +256,20 @@ export function GalleryScene(props: SceneProps) {
             resolution={512}
           />
           <CameraRig focused={focused} reset={reset} />
+          <CompanionProjection
+            item={props.exhibition.furniture.find(
+              (item) => item.kind === "companion",
+            )}
+            overrides={props.furnitureOverrides}
+            element={companionElement}
+          />
         </Canvas>
       </SceneBoundary>
+      {props.companion && (
+        <div ref={companionElement} className="companion-overlay">
+          <div className="companion-anchor">{props.companion}</div>
+        </div>
+      )}
       <LoadingNotice />
       <div className="scene-controls">
         <span>

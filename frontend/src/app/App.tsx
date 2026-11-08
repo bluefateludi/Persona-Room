@@ -1,5 +1,5 @@
 import { GalleryUI } from "../features/GalleryUI";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import type {
   FurnitureOverrides,
   Selection,
@@ -10,6 +10,11 @@ import {
   loadContent,
 } from "../data/content";
 import { GalleryScene } from "../scene/GalleryScene";
+const SpineActor = lazy(() =>
+  import("../character/SpineActor").then((module) => ({
+    default: module.SpineActor,
+  })),
+);
 export function App() {
   const [content, setContent] = useState({
     character: initialCharacter,
@@ -63,7 +68,35 @@ export function App() {
           </p>
         </div>
       </div>
-      <GalleryScene {...props} />
+      {contentResolved ? (
+        <GalleryScene
+          {...props}
+          companion={
+            content.character.spine ? (
+              <Suspense
+                fallback={
+                  <span className="companion-loading">正在迎接黍…</span>
+                }
+              >
+                <SpineActor
+                  source={content.character.spine}
+                  onInteract={() =>
+                    onSelect({ id: "shu-companion", kind: "companion" })
+                  }
+                />
+              </Suspense>
+            ) : (
+              <span className="companion-loading">动态小人暂不可用</span>
+            )
+          }
+        />
+      ) : (
+        <section className="gallery-scene">
+          <div className="webgl-fallback" role="status">
+            正在打开馆藏…
+          </div>
+        </section>
+      )}
       <nav className="exhibit-nav" aria-label="展品目录">
         {content.exhibition.furniture.map((item, index) => (
           <button
