@@ -1,0 +1,85 @@
+{
+  "verifiedAt": "2026-11-08",
+  "browser": "Chromium via Playwright CLI",
+  "glb": {
+    "rendered": true,
+    "bounds": [
+      0.696230947971344,
+      1.0000136494636536,
+      0.5119622349739075
+    ],
+    "vertices": 1019424,
+    "triangles": 1980890,
+    "embeddedTextures": 2,
+    "localLoadMs": 655,
+    "performanceNote": "Local cached/file-served measurement, not production download benchmark"
+  },
+  "spine": {
+    "rendered": true,
+    "version": "3.8.99",
+    "animations": [
+      "Default",
+      "Interact",
+      "Move",
+      "Relax",
+      "Sit",
+      "Sleep"
+    ],
+    "idle": "Relax",
+    "interact": "Interact",
+    "pma": true
+  },
+  "audio": {
+    "decoded": true,
+    "playbackEnded": true,
+    "clipStart": 0,
+    "clipEnd": 11.301043,
+    "sampleRate": 44100,
+    "channels": 1,
+    "subtitleId": "char_2025_shu_CN_001",
+    "subjectiveListeningReviewed": false
+  },
+  "component": {
+    "strictModeCanvasCount": 1,
+    "unmountedCanvasCount": 0,
+    "typecheck": "passed"
+  },
+  "limitations": [
+    "Furniture GLB not created: paid submission failed with HTTP 503 AUTH_SERVICE_UNAVAILABLE; no new task and balance unchanged.",
+    "Spine runtime emits one Pixi utils.rgb2hex deprecation warning.",
+    "Mobile GLB performance requires integrated testing.",
+    "Terra library direct character URL not verified."
+  ],
+  "assets": [
+    {
+      "file": "shu-figurine.glb",
+      "bytes": 48497152,
+      "sha256": "42098bbc990541b48b52ee37dbbc80979a6906a182f377c1b8e95270c3b1edbf"
+    },
+    {
+      "file": "spine/build_char_2025_shu.skel",
+      "bytes": 319173,
+      "sha256": "9ae6a5dcdbedef8f50d4c082d5da1fa38c6fa989adaa9b75b04cb335ce911005"
+    },
+    {
+      "file": "spine/build_char_2025_shu.atlas",
+      "bytes": 12400,
+      "sha256": "202a51426ea21fd5b51cbcaec8da2f556d86ed9384087444d70a2efc4e62803b"
+    },
+    {
+      "file": "spine/build_char_2025_shu.png",
+      "bytes": 428073,
+      "sha256": "b826d766d76cd188fb8bb005c56012be2b7e75b02952d3fb2c7e047993d858b2"
+    },
+    {
+      "file": "voice/CN_001.wav",
+      "bytes": 996796,
+      "sha256": "cb2a311267183ea0d0c456888b1bd623d9b5ca02a72126f3e4c72da2037d8620"
+    },
+    {
+      "file": "rice-archive-cabinet.png",
+      "bytes": 1514350,
+      "sha256": "fde4441d872969a974397cd02fed13c830540e5911efa9b994ab12339d8e30de"
+    }
+  ]
+}
