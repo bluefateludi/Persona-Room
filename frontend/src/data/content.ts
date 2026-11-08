@@ -1,3 +1,4 @@
+import { validateContent } from "./validateContent";
 import type {
   CharacterContent,
   ExhibitionContent,
@@ -98,13 +99,7 @@ export async function loadContent(
       return response.json();
     }),
   );
-  if (
-    character.schemaVersion !== 1 ||
-    exhibition.schemaVersion !== 1 ||
-    character.id !== exhibition.characterId ||
-    !Array.isArray(exhibition.furniture)
-  )
-    throw new Error("内容包格式不匹配");
+  validateContent(character, exhibition);
   const mapped = JSON.parse(
     JSON.stringify({ character, exhibition }),
     (_key, value) => (typeof value === "string" ? publicUrl(value) : value),

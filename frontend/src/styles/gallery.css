@@ -444,3 +444,12 @@ a {
 .is-inspecting .scene-controls {
   top: 45px;
 }
+.companion-anchor {
+  width: 240px;
+  max-width: 240px;
+  pointer-events: auto;
+}
+.companion-anchor canvas {
+  display: block;
+  max-width: 100%;
+}

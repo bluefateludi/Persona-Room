@@ -76,7 +76,7 @@ export function Furniture({
           </group>
         ))}
         <Box position={[0, 0.12, 0]} size={[1.85, 0.14, 0.8]} color={gold} />
-        <SceneLabel position={[0, 1.95, 0]} text="02 / 岁月档案" />
+        <SceneLabel position={[0, 1.95, 0]} text={item.label} />
       </group>
     );
   if (item.kind === "voice")
@@ -96,7 +96,7 @@ export function Furniture({
           <coneGeometry args={[0.4, 0.7, 32, 1, true]} />
           <meshStandardMaterial color={gold} side={2} />
         </mesh>
-        <SceneLabel position={[0, 2.2, 0]} text="03 / 听见黍" />
+        <SceneLabel position={[0, 2.2, 0]} text={item.label} />
       </group>
     );
   if (item.kind === "art")
@@ -125,7 +125,7 @@ export function Furniture({
             </Suspense>
           </AssetBoundary>
         )}
-        <SceneLabel position={[0, 3.4, 0]} text="04 / 丹青留影" />
+        <SceneLabel position={[0, 3.4, 0]} text={item.label} />
       </group>
     );
   if (item.kind === "companion")
@@ -135,7 +135,7 @@ export function Furniture({
           <cylinderGeometry args={[0.65, 0.65, 0.08, 64]} />
           <meshStandardMaterial color={gold} />
         </mesh>
-        <SceneLabel position={[0, 0.65, 0]} text="05 / 与黍相遇" />
+        <SceneLabel position={[0, 0.65, 0]} text={item.label} />
       </group>
     );
   return null;

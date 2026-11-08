@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, useProgress } from "@react-three/drei";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  Html,
+  OrbitControls,
+  ContactShadows,
+  useProgress,
+} from "@react-three/drei";
 import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type {
@@ -11,6 +16,7 @@ import type {
 import { SceneLabel } from "./SceneLabel";
 import { Figurine } from "../character/Figurine";
 import { Box, Furniture } from "../furniture/Furniture";
+type SceneProps = GallerySceneProps & { companion?: ReactNode };
 function Room() {
   return (
     <group>
@@ -80,6 +86,7 @@ function CameraRig({
   reset: number;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
+  const invalidate = useThree((state) => state.invalidate);
   const desired = useRef(new Vector3(8, 6.8, 10));
   const target = useRef(new Vector3(0, 1, 0));
   const moving = useRef(true);
@@ -92,6 +99,7 @@ function CameraRig({
       p[2] + (focused ? 5 : 10),
     );
     moving.current = true;
+    invalidate();
   }, [focused?.[0], focused?.[1], focused?.[2], reset]);
   useFrame(({ camera }, delta) => {
     if (!moving.current || !controls.current) return;
@@ -99,6 +107,7 @@ function CameraRig({
     camera.position.lerp(desired.current, t);
     controls.current.target.lerp(target.current, t);
     controls.current.update();
+    invalidate();
     if (camera.position.distanceTo(desired.current) < 0.02)
       moving.current = false;
   });
@@ -117,13 +126,7 @@ function CameraRig({
     />
   );
 }
-function Exhibit({
-  item,
-  props,
-}: {
-  item: FurnitureItem;
-  props: GallerySceneProps;
-}) {
+function Exhibit({ item, props }: { item: FurnitureItem; props: SceneProps }) {
   const [hover, setHover] = useState(false);
   const override = props.furnitureOverrides[item.id];
   const selected = props.selection?.id === item.id;
@@ -165,7 +168,7 @@ function Exhibit({
           </group>
           <SceneLabel
             position={[0, 0.6, 1.35]}
-            text="黍   SHU / 001"
+            text={`${props.character.name}   ${props.character.id.toUpperCase()} / 001`}
             width={1.35}
             height={0.3}
             light
@@ -173,6 +176,16 @@ function Exhibit({
         </group>
       ) : (
         <Furniture item={item} character={props.character} />
+      )}
+      {item.kind === "companion" && props.companion && (
+        <Html
+          center
+          position={[0, 1.25, 0]}
+          distanceFactor={6}
+          zIndexRange={[10, 0]}
+        >
+          <div className="companion-anchor">{props.companion}</div>
+        </Html>
       )}
       {(hover || selected) && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 0]}>
@@ -197,7 +210,7 @@ function LoadingNotice() {
     </div>
   ) : null;
 }
-export function GalleryScene(props: GallerySceneProps) {
+export function GalleryScene(props: SceneProps) {
   const [reset, setReset] = useState(0);
   const selected = props.exhibition.furniture.find(
     (x) => x.id === props.selection?.id,
@@ -208,6 +221,7 @@ export function GalleryScene(props: GallerySceneProps) {
   return (
     <section className="gallery-scene" aria-label="三维互动展厅">
       <Canvas
+        frameloop="demand"
         shadows
         dpr={[1, 1.6]}
         camera={{ position: [8, 6.8, 10], fov: 40 }}
