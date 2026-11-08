@@ -5,7 +5,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const files = [
  'shu-figurine.glb', 'shu-figurine-concept.png', 'shu-reference.png',
  'spine/build_char_2025_shu.skel', 'spine/build_char_2025_shu.atlas', 'spine/build_char_2025_shu.png',
- 'voice/CN_001.wav',
+ 'voice/CN_001.wav', 'rice-archive-cabinet.glb',
 ];
 export const publicFiles = files.map(name => `assets/shu/${name}`);
 export async function prepareAssets() {
@@ -33,4 +33,3 @@ export async function prepareAssets() {
  console.log(`Prepared ${entries.length} whitelisted files. Internal generation records excluded.`);
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await prepareAssets();
-

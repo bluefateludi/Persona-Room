@@ -24,3 +24,43 @@
 - 最终证据：assets/shu/validation/assets-preview.png 与 report.json；完整来源和生成 PNG 提示词见 assets/shu/README.md。
 - 仍缺：主题档案柜 GLB（授权服务 503，已确认报价只提交一次，无任务、无扣费），文库角色直达链接、人工听感验收、移动设备集成性能验证。可运行首版使用程序化档案柜。
 - Hi3D 本会话已 OAuth 登录，账户查询正常，1065 积分；收费接口存在间歇授权服务故障，不自动重试。其他工作树不要重复提交。
+- 可集成内容提交：312a54a（包含全部真实素材与组件；后续仅状态/格式收尾）。
+
+## 用户授权重试后的恢复检查（2026-11-08）
+- 用户明确指示遇错重试；此前 45 积分授权仍保留，不重复要求确认同一范围。
+- 原 MCP 报价已调用提交一次，工具约束每份报价仅提交一次；本轮没有再次调用原报价，也没有新建重复报价。
+- 尝试正常网页入口：cua.getTab 两次均超时；改用 Windows computer-use，list_apps/list_windows 两次均超时。未发生新的收费生成提交。
+- Hi3D get_capabilities 查询成功；这只能证明查询通道可用，不能证明收费生成通道已恢复。
+- 原素材交接提交 312a54a、5863643 已存在，本轮再次运行 prepare-assets、validate-content、SpineActor TypeScript 检查均通过。
+- 待恢复条件：正常网页控制可用，或 Hi3D 提供已失败报价的有效恢复/重提途径。不要把连接重试记录误写成建模请求已重发。
+
+## 再次 MCP 请求复核（用户明确要求继续请求）
+- list_tasks 首次返回 HTTP 503 AUTH_SERVICE_UNAVAILABLE；按用户授权重试 list_tasks 后成功。
+- get_balance 成功，余额 1065；任务列表仍只有已有手办，无档案柜新任务。
+- 这次实际重发的是查询请求，未重发收费 create_generation。当前工具声明仍为“每份报价只能提交一次”，没有失败报价重置接口。
+- 可确认授权校验错误具有间歇性；不能据查询恢复推断收费端已恢复。
+
+## Codex MCP OAuth 重新授权
+- 现有 hi3d 配置符合用户要求：enabled=true，streamable_http，https://agent.hi3d.ai/mcp；未改动其他设置。
+- codex mcp login hi3d 返回 Successfully logged in to MCP server 'hi3d'，用户已在浏览器完成 OAuth。
+- 授权后 get_account_context 和 get_capabilities 各调用两次（含明确授权重试），全部返回 HTTP 503 AUTH_SERVICE_UNAVAILABLE。
+- 本聊天可见 11 个 Hi3D 工具，但这不代表当前远程调用可用。尚未恢复运行验证，未发新的收费生成请求。
+
+## 最新 MCP 重试：查询恢复
+- 用户要求继续重试后，get_account_context、get_capabilities、list_tasks 三个真实 MCP 请求均成功。
+- 当前余额 1065；任务列表仍只有原手办，无档案柜新任务。
+- 查询连接已恢复，无需为查询重启客户端；收费生成未重发，原报价仍受工具的一次提交限制。
+
+## 档案柜新报价提交成功（2026-11-08 13:15 香港时间）
+- 用户明确要求获取替代报价；新报价仍为 45 积分，同一张 PNG、v3.0 高质、贴图、PBR、私有 GLB。
+- 新报价仅提交一次，成功创建任务 73fe37c657534598b1fc5ffba89bb0a0，初始状态 queued，actual_points=45。
+- 原“无法继续提交”结论已过时。后续只查询这个新任务；内部状态存 assets/shu/generation-state.json，不公开部署。
+
+## 档案柜 GLB 已完成并验证（2026-11-08）
+- 模型：https://www.hi3d.ai/3d-model/73fe37c657534598b1fc5ffba89bb0a0 。生成成功，45 积分，余额 1020；禁止重复生成。
+- 本地 assets/shu/rice-archive-cabinet.glb，48,211,572 字节，1 网格、1 材质、2 张内嵌 JPEG、1,968,034 三角面；SHA256 与边界见 assets/shu/validation/report.json。
+- archive-desk.modelUrl 已配置 /content/assets/shu/rice-archive-cabinet.glb；发布脚本白名单增至 10 项，import-data 重新运行仍保留模型绑定。
+- Chromium 独立渲染通过；使用 codex/scene 3bb5ab9 的源码只读启动隔离集成预览，确认真实新模型加载，并实际点击三维柜门打开档案面板。集成控制台 0 errors，1 条已知 Spine/Pixi 弃用警告。
+- 证据：validation/cabinet-preview.png、cabinet-in-gallery.png、cabinet-archive-click.png。未修改或合并场景工作树，场景线可合入本次素材提交。
+- 模型仍为高面数原始资产：手办与柜体合计约 97 MB、395 万三角面，低端设备性能与公网加载仍需按部署目标评估；不声称完成模型减面优化。
+- 本线必需素材交付完成；未发布、未 push、未合并 main。

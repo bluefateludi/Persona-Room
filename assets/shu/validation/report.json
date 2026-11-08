@@ -45,10 +45,10 @@
     "typecheck": "passed"
   },
   "limitations": [
-    "Furniture GLB not created: paid submission failed with HTTP 503 AUTH_SERVICE_UNAVAILABLE; no new task and balance unchanged.",
     "Spine runtime emits one Pixi utils.rgb2hex deprecation warning.",
     "Mobile GLB performance requires integrated testing.",
-    "Terra library direct character URL not verified."
+    "Terra library direct character URL not verified.",
+    "Cabinet is 48.2 MB and 1.97 million triangles; production bandwidth and low-end mobile performance remain to be measured."
   ],
   "assets": [
     {
@@ -81,5 +81,22 @@
       "bytes": 1514350,
       "sha256": "fde4441d872969a974397cd02fed13c830540e5911efa9b994ab12339d8e30de"
     }
-  ]
+  ],
+  "cabinet": {
+    "rendered": true,
+    "bytes": 48211572,
+    "sha256": "46ffdfb55af529e97c55d1d72717c25b45ed8d292cf6a7ef878d8bd5e81abfa6",
+    "vertices": 1016090,
+    "triangles": 1968034,
+    "embeddedTextures": 2,
+    "bounds": [
+      0.7729001045227051,
+      0.9991356432437897,
+      0.5507137477397919
+    ],
+    "modelPageUrl": "https://www.hi3d.ai/3d-model/73fe37c657534598b1fc5ffba89bb0a0",
+    "sceneHeight": 1.7,
+    "integratedPreview": "Read-only codex/scene 3bb5ab9 with assets branch public content",
+    "consoleErrors": 0
+  }
 }

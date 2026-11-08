@@ -26,7 +26,9 @@ for(const url of refs)await fs.access(path.join(published,url.slice('/content/'.
 const allowed=new Set([...publicFiles,'characters/shu.json','exhibitions/shu.json']);
 async function audit(dir,relative=''){for(const entry of await fs.readdir(dir,{withFileTypes:true})){const rel=relative+entry.name;assert(!entry.isSymbolicLink(),'public symlink rejected');if(entry.isDirectory())await audit(path.join(dir,entry.name),rel+'/');else assert(allowed.has(rel),`unexpected public file: ${rel}`);}}
 await audit(published);
-const b=await fs.readFile(path.join(root,'assets/shu/shu-figurine.glb'));assert.equal(b.toString('ascii',0,4),'glTF');assert.equal(b.readUInt32LE(4),2);assert.equal(b.readUInt32LE(8),b.length);
+for(const file of publicFiles.filter(file=>file.endsWith('.glb'))) {
+const b=await fs.readFile(path.join(root,file));assert.equal(b.toString('ascii',0,4),'glTF');assert.equal(b.readUInt32LE(4),2);assert.equal(b.readUInt32LE(8),b.length);
 const gltf=JSON.parse(b.subarray(20,20+b.readUInt32LE(12)).toString());assert(gltf.images.every(i=>i.bufferView!==undefined),'GLB textures must be embedded');
+}
 const wav=await fs.readFile(path.join(root,'assets/shu/voice/CN_001.wav'));assert.equal(wav.toString('ascii',0,4),'RIFF');assert.equal(wav.toString('ascii',8,12),'WAVE');assert.equal(wav.readUInt32LE(4)+8,wav.length);
 console.log(`PASS: contract IDs, vectors, references, ${allowed.size} public files, embedded GLB textures and WAV header. Browser evidence is separate.`);

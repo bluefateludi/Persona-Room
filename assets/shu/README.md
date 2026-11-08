@@ -19,8 +19,8 @@
 ## 档案柜
 - rice-archive-cabinet.png 由内置 image_gen 生成，未使用 Hi3D 2D 收费生成。
 - Prompt：Single complete freestanding archive cabinet, ivory lacquer body, midnight-blue doors, gold rice-ear relief, two closed doors and two upper drawers, four short sturdy feet. Front three-quarter view, pure white background, no text, no scene, no characters, all parts connected.
-- Hi3D v3.0 高质、带贴图、PBR、私有 GLB 当前报价 45 积分。用户确认后提交一次，授权校验 HTTP 503；未返回新任务，复核无扣分，未自动重试。
-- 家具 GLB 仍未完成；展厅继续使用程序化 archive-desk 外观。内部报价与生成记录不在公开白名单。
+- Hi3D v3.0 高质、带贴图、PBR、私有 GLB，45 积分。用户明确要求替代报价后提交成功，模型已完成：https://www.hi3d.ai/3d-model/73fe37c657534598b1fc5ffba89bb0a0 。
+- rice-archive-cabinet.glb 已下载并纳入公开白名单；archive-desk.modelUrl 指向本地静态资产。原始模型 48,211,572 字节，1,968,034 三角面、两张内嵌 JPEG；场景现有容器归一化至 1.7 单位。内部生成记录不发布。
 
 ## 验证与限制
 - Chromium 实际渲染 GLB 和 Spine，截图 validation/assets-preview.png。
@@ -29,3 +29,5 @@
 - 高面数模型约 198 万三角面，移动设备性能仍需集成测试。
 - Pixi Spine 4.0.6 在 Pixi 7.4.3 下有一次 utils.rgb2hex 弃用警告，实际动画与渲染正常。未修改第三方包或屏蔽警告。
 - 独立预览（场景工程安装依赖后）：先运行准备脚本，再 `node scripts/serve-asset-preview.mjs`，打开提示的 /scripts/asset-preview.html。预览只读已发布静态素材，不依赖内部生成记录。
+
+- 档案柜验证入口：独立预览地址追加 ?model=cabinet；截图见 validation/cabinet-preview.png、cabinet-in-gallery.png。现有场景源码只读复用，未修改场景分支。

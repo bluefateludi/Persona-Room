@@ -65,7 +65,8 @@
         1,
         1
       ],
-      "contentId": "profile"
+      "contentId": "profile",
+      "modelUrl": "/content/assets/shu/rice-archive-cabinet.glb"
     },
     {
       "id": "voice-station",

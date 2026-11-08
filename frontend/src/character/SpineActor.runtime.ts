@@ -88,5 +88,3 @@ export async function mountSpineActor(host: HTMLElement, source: SpineAsset, sig
     throw error;
   }
 }
-
-
