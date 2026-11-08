@@ -33,4 +33,3 @@ export async function prepareAssets() {
  console.log(`Prepared ${entries.length} whitelisted files. Internal generation records excluded.`);
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await prepareAssets();
-

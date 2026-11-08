@@ -39,5 +39,3 @@ const furniture=[
 await fs.writeFile('content/characters/shu.json',JSON.stringify(character,null,2)+'\n');
 await fs.writeFile('content/exhibitions/shu.json',JSON.stringify({schemaVersion:1,id:'shu-gallery',characterId:'shu',title:'黍 · 百谷长青',furniture},null,2)+'\n');
 console.log('Generated curated character and exhibition content');
-
-
