@@ -43,6 +43,10 @@ export async function mountSpineActor(host: HTMLElement, source: SpineAsset, sig
     const animations = data.animations.map(animation => animation.name);
     if (!animations.includes(source.animations.idle)) throw new Error('配置的待机动画不存在');
     if (source.animations.interact && !animations.includes(source.animations.interact)) throw new Error('配置的互动动画不存在');
+    const walkAnimation = source.animations.move ?? (animations.includes('Move') ? 'Move' : source.animations.idle);
+    if (!animations.includes(walkAnimation)) throw new Error('配置的行走动画不存在');
+    let moving = false;
+    let facing = 1;
     app = new Application({ backgroundAlpha: 0, antialias: true, autoDensity: true, resolution: Math.min(devicePixelRatio, 2) });
     const actor = new Spine(data);
     actor.autoUpdate = false;
@@ -57,8 +61,8 @@ export async function mountSpineActor(host: HTMLElement, source: SpineAsset, sig
       const height = Math.max(host.clientHeight, 200);
       app.renderer.resize(width, height);
       const scale = Math.min(width * 0.9 / bounds.width, height * 0.88 / bounds.height);
-      actor.scale.set(scale);
-      actor.position.set(width / 2 - (bounds.x + bounds.width / 2) * scale, height * 0.94 - (bounds.y + bounds.height) * scale);
+      actor.scale.set(scale * facing, scale);
+      actor.position.set(width / 2 - (bounds.x + bounds.width / 2) * scale * facing, height * 0.94 - (bounds.y + bounds.height) * scale);
     };
     fit();
     observer = new ResizeObserver(fit);
@@ -68,13 +72,25 @@ export async function mountSpineActor(host: HTMLElement, source: SpineAsset, sig
     });
     const canvas = app.view as HTMLCanvasElement;
     canvas.setAttribute('aria-hidden', 'true');
+    canvas.dataset.animation = source.animations.idle;
     canvas.style.display = 'block';
     host.appendChild(canvas);
     return {
       animations,
       version: data.version,
+      setMotion(nextMoving: boolean, nextFacing: 'left' | 'right') {
+        if (disposed) return;
+        const direction = nextFacing === 'left' ? -1 : 1;
+        if (direction !== facing) { facing = direction; fit(); }
+        if (moving !== nextMoving) {
+          moving = nextMoving;
+          canvas.dataset.animation = moving ? walkAnimation : source.animations.idle;
+          actor.state.setAnimation(0, canvas.dataset.animation, true);
+        }
+      },
       interact() {
         if (disposed) return;
+        moving = false;
         const name = source.animations.interact;
         if (name) {
           actor.state.setAnimation(0, name, false);

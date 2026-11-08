@@ -1,7 +1,7 @@
 import { CompanionProjection } from "./CompanionProjection";
 import { SceneBoundary } from "./SceneBoundary";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, useProgress } from "@react-three/drei";
 import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -9,15 +9,22 @@ import type {
   GallerySceneProps,
   FurnitureItem,
   Vec3,
+  Selection,
 } from "../../../shared/src/contracts";
 import { SceneLabel } from "./SceneLabel";
 import { Figurine } from "../character/Figurine";
 import { Box, Furniture } from "../furniture/Furniture";
-type SceneProps = GallerySceneProps & { companion?: ReactNode };
-function Room() {
+import { findPath, getObstacles, nearestWalkable, pathToExhibit, type Point } from "./navigation";
+export interface CompanionMotion { moving: boolean; facing: 'left' | 'right'; onInteract: () => void }
+type SceneProps = GallerySceneProps & {
+  companion?: (motion: CompanionMotion) => ReactNode;
+  visitRequest?: { id: string; sequence: number };
+  onWalkingChange?: (moving: boolean) => void;
+};
+function Room({ onFloorClick }: { onFloorClick: (event: ThreeEvent<MouseEvent>) => void }) {
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow onClick={onFloorClick}>
         <circleGeometry args={[8, 96]} />
         <meshStandardMaterial color="#d1c8b3" roughness={0.88} />
       </mesh>
@@ -123,7 +130,7 @@ function CameraRig({
     />
   );
 }
-function Exhibit({ item, props }: { item: FurnitureItem; props: SceneProps }) {
+function Exhibit({ item, props, onVisit }: { item: FurnitureItem; props: SceneProps; onVisit: (item: FurnitureItem) => void }) {
   const [hover, setHover] = useState(false);
   const override = props.furnitureOverrides[item.id];
   const selected = props.selection?.id === item.id;
@@ -134,7 +141,7 @@ function Exhibit({ item, props }: { item: FurnitureItem; props: SceneProps }) {
       scale={item.scale}
       onClick={(e) => {
         e.stopPropagation();
-        props.onSelect({ id: item.id, kind: item.kind });
+        if (e.delta <= 5) onVisit(item);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -200,17 +207,83 @@ function LoadingNotice() {
 export function GalleryScene(props: SceneProps) {
   const [reset, setReset] = useState(0);
   const companionElement = useRef<HTMLDivElement>(null);
+  const companionItem = props.exhibition.furniture.find(item => item.kind === 'companion');
+  const home = companionItem ? (props.furnitureOverrides[companionItem.id]?.position ?? companionItem.position) : [-2.5, 0, 1];
+  const position = useRef<Point>([home[0], home[2]]);
+  const [route, setRoute] = useState<Point[]>([]);
+  const [facing, setFacing] = useState<'left' | 'right'>('right');
+  const [notice, setNotice] = useState('点一处空地，陪黍逛逛展厅');
+  const [sceneReady, setSceneReady] = useState(false);
+  const pending = useRef<Selection>(null);
+  const moving = route.length > 0;
+  const obstacles = useMemo(() => getObstacles(props.exhibition.furniture, props.furnitureOverrides), [props.exhibition.furniture, props.furnitureOverrides]);
+  const stop = useCallback(() => { pending.current = null; setRoute([]); setNotice('在这里歇一会儿吧'); }, []);
+  useEffect(() => { props.onWalkingChange?.(moving); }, [moving, props.onWalkingChange]);
+  const previousHome = useRef(home.join(','));
+  useEffect(() => {
+    // Re-layout cancels stale destinations and relocates only if a new obstacle covers her feet.
+    const homeChanged = previousHome.current !== home.join(',');
+    previousHome.current = home.join(',');
+    const safe = nearestWalkable(homeChanged ? [home[0], home[2]] : position.current, obstacles);
+    if (safe) position.current = safe;
+    pending.current = null; setRoute([]);
+    setNotice(safe ? '点一处空地，陪黍逛逛展厅' : '展厅太拥挤了，请先调整家具');
+  }, [obstacles, home[0], home[2]]);
+  useEffect(() => {
+    const key = (event: KeyboardEvent) => { if (event.key === 'Escape') stop(); };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, [stop]);
+  const interact = useCallback(() => {
+    stop();
+    if (companionItem) props.onSelect({ id: companionItem.id, kind: 'companion' });
+  }, [stop, companionItem, props.onSelect]);
+  const startJourney = useCallback((path: Point[] | null, selection: Selection, label: string) => {
+    pending.current = null;
+    if (!path) { setRoute([]); setNotice('这里暂时走不到，换一处空地试试'); return; }
+    pending.current = selection;
+    props.onSelect(null);
+    setNotice(label);
+    setRoute(path);
+  }, [props.onSelect]);
+  const visit = useCallback((item: FurnitureItem) => {
+    if (item.kind === 'companion') { interact(); return; }
+    const selection = { id: item.id, kind: item.kind };
+    if (!sceneReady || !props.character.spine) { props.onSelect(selection); return; }
+    startJourney(pathToExhibit(position.current, item, props.furnitureOverrides, obstacles), selection, `一起去：${item.label}`);
+  }, [interact, sceneReady, props.character.spine, props.furnitureOverrides, props.onSelect, obstacles, startJourney]);
+  // A request is a user action, not a selected exhibit; repeated visits also work.
+  const handledRequest = useRef(0);
+  useEffect(() => {
+    if (!props.visitRequest || props.visitRequest.sequence === handledRequest.current) return;
+    handledRequest.current = props.visitRequest.sequence;
+    const item = props.exhibition.furniture.find(item => item.id === props.visitRequest!.id);
+    if (item) visit(item);
+  }, [props.visitRequest, props.exhibition.furniture, visit]);
+  useEffect(() => { if (props.selection) { pending.current = null; setRoute([]); } }, [props.selection]);
+  function arrive() {
+    const selection = pending.current;
+    pending.current = null; setRoute([]);
+    setNotice(selection ? '到了，一起看看吧' : '还想去哪里？点点地面吧');
+    if (selection) props.onSelect(selection);
+  }
+  function walkTo(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+    if (event.delta > 5 || !props.character.spine) return;
+    startJourney(findPath(position.current, [event.point.x, event.point.z], obstacles), null, '正在散步 · 可以随时换个目的地');
+  }
   const selected = props.exhibition.furniture.find(
     (x) => x.id === props.selection?.id,
   );
   const focused = selected
-    ? (props.furnitureOverrides[selected.id]?.position ?? selected.position)
+    ? (selected.kind === "companion" ? [position.current[0], 0, position.current[1]] as Vec3 : props.furnitureOverrides[selected.id]?.position ?? selected.position)
     : null;
   return (
-    <section className="gallery-scene" aria-label="三维互动展厅">
+    <section className={`gallery-scene${moving ? " is-walking" : ""}`} aria-label="三维互动展厅">
       <SceneBoundary>
         <Canvas
           frameloop="demand"
+          onCreated={() => setSceneReady(true)}
           shadows
           dpr={[1, 1.6]}
           camera={{ position: [8, 6.8, 10], fov: 40 }}
@@ -243,9 +316,9 @@ export function GalleryScene(props: SceneProps) {
             penumbra={1}
             color="#ffe6b5"
           />
-          <Room />
-          {props.exhibition.furniture.map((item) => (
-            <Exhibit key={item.id} item={item} props={props} />
+          <Room onFloorClick={walkTo} />
+          {props.exhibition.furniture.filter(item => item.kind !== "companion").map((item) => (
+            <Exhibit key={item.id} item={item} props={props} onVisit={visit} />
           ))}
           <ContactShadows
             position={[0, 0.012, 0]}
@@ -256,18 +329,15 @@ export function GalleryScene(props: SceneProps) {
             resolution={512}
           />
           <CameraRig focused={focused} reset={reset} />
-          <CompanionProjection
-            item={props.exhibition.furniture.find(
-              (item) => item.kind === "companion",
-            )}
-            overrides={props.furnitureOverrides}
-            element={companionElement}
-          />
+          <CompanionProjection position={position} route={route} element={companionElement} onArrive={arrive} onFacing={setFacing} />
+          {moving && <mesh position={[route[route.length - 1][0], 0.03, route[route.length - 1][1]]} rotation={[-Math.PI / 2, 0, 0]} raycast={() => {}}>
+            <ringGeometry args={[0.18, 0.24, 40]} /><meshBasicMaterial color="#f2d58a" depthWrite={false} />
+          </mesh>}
         </Canvas>
       </SceneBoundary>
       {props.companion && (
         <div ref={companionElement} className="companion-overlay">
-          <div className="companion-anchor">{props.companion}</div>
+          <div className="companion-anchor">{props.companion({ moving, facing, onInteract: interact })}</div>
         </div>
       )}
       <LoadingNotice />
@@ -277,6 +347,7 @@ export function GalleryScene(props: SceneProps) {
         </span>
         <button
           onClick={() => {
+            stop();
             props.onSelect(null);
             setReset((v) => v + 1);
           }}
@@ -288,14 +359,19 @@ export function GalleryScene(props: SceneProps) {
             const item = props.exhibition.furniture.find(
               (x) => x.kind === "model",
             );
-            if (item) props.onSelect({ id: item.id, kind: item.kind });
+            if (item) { stop(); props.onSelect({ id: item.id, kind: item.kind }); }
           }}
         >
           ⊕ 检视手办
         </button>
       </div>
+      <div className="companion-status">
+        <span className={moving ? 'walk-dot active' : 'walk-dot'} aria-hidden="true" />
+        <span role="status" aria-live="polite">{notice}</span>
+        {moving && <button type="button" onClick={stop}>停在这里</button>}
+      </div>
       <div className="scene-hint">
-        拖动旋转视角 <b>·</b> 滚轮缩放 <b>·</b> 点击展品探索
+        拖动旋转视角 <b>·</b> 滚轮缩放 <b>·</b> 点击地面散步 <b>·</b> 点击展品带路
       </div>
     </section>
   );

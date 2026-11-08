@@ -597,3 +597,20 @@ a {
   border-radius: 2px;
   white-space: nowrap;
 }
+
+/* The projected point is at the companion's feet, matching Spine's 94% baseline. */
+.companion-overlay { transform-origin: 50% 94%; }
+.companion-status {
+  position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; max-width: calc(100% - 32px);
+  padding: 10px 15px; border: 1px solid #ad8b4c66; border-radius: 3px;
+  color: #eee3cb; background: #173137eb; font-size: 12px; z-index: 5;
+}
+.companion-status span[role="status"] { min-width: 0; }
+.walk-dot { width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: #b99a56; }
+.walk-dot.active { box-shadow: 0 0 0 4px #b99a5630; }
+.companion-status button { flex-shrink: 0; border: 0; border-left: 1px solid #ad8b4c66; padding: 2px 0 2px 12px; color: #f2d58a; background: transparent; cursor: pointer; font: inherit; }
+@media (max-width: 800px) {
+  .companion-status { bottom: 54px; width: max-content; font-size: 11px; }
+  .scene-hint { max-width: calc(100% - 24px); font-size: 10px; letter-spacing: 0; white-space: normal; text-align: center; }
+}

@@ -4,7 +4,7 @@ export interface SourceRef { label: string; url: string }
 export interface ArchiveEntry { id: string; title: string; text: string; source: SourceRef }
 export interface VoiceEntry { id: string; title: string; text: string; language: string; audioUrl: string | null; source?: SourceRef }
 export interface Artwork { id: string; title: string; imageUrl: string; description: string }
-export interface SpineAsset { skeletonUrl: string; atlasUrl: string; textureUrl: string; version: '3.8'; premultipliedAlpha: boolean; animations: { idle: string; interact?: string }; verified: boolean }
+export interface SpineAsset { skeletonUrl: string; atlasUrl: string; textureUrl: string; version: '3.8'; premultipliedAlpha: boolean; animations: { idle: string; interact?: string; move?: string }; verified: boolean }
 export interface CharacterContent {
   schemaVersion: 1; id: string; name: string; intro: string;
   model: { url: string; posterUrl: string; targetHeight: number; rotation: Vec3 };
@@ -26,6 +26,7 @@ export interface GallerySceneProps {
   onSelect: (selection: Selection) => void;
 }
 export interface GalleryUIProps extends GallerySceneProps {
+  isWalking?: boolean;
   onLayoutChange: (overrides: FurnitureOverrides) => void;
 }
-export interface SpineActorProps { source: SpineAsset; onInteract?: () => void; className?: string }
+export interface SpineActorProps { source: SpineAsset; onInteract?: () => void; className?: string; moving?: boolean; facing?: 'left' | 'right' }

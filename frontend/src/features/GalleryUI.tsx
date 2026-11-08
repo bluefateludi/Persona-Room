@@ -13,13 +13,14 @@ const navigation: [Panel, string][] = [['intro', '展品'], ['archive', '档案'
 export function GalleryUI(props: GalleryUIProps) {
   return <GalleryUISession key={`${props.character.id}:${props.exhibition.id}`} {...props} />;
 }
-function GalleryUISession({ character, exhibition, selection, furnitureOverrides, onSelect, onLayoutChange }: GalleryUIProps) {
+function GalleryUISession({ isWalking, character, exhibition, selection, furnitureOverrides, onSelect, onLayoutChange }: GalleryUIProps) {
   const [initial] = useState(() => readSave(character, exhibition));
   const [save, setSave] = useState(initial.save);
   const [warning, setWarning] = useState(initial.warning);
   const [notice, setNotice] = useState('');
   const [panel, setPanel] = useState<Panel>('intro');
   const [open, setOpen] = useState(false);
+  useEffect(() => { if (isWalking) setOpen(false); }, [isWalking]);
   const [archiveId, setArchiveId] = useState<string>();
   const player = useVoicePlayer();
   const layoutCallback = useRef(onLayoutChange);
@@ -36,7 +37,7 @@ function GalleryUISession({ character, exhibition, selection, furnitureOverrides
   useEffect(() => {
     if (selection === previousSelection.current) return;
     previousSelection.current = selection;
-    if (!selection) return;
+    if (!selection) { setOpen(false); return; }
     const furniture = exhibition.furniture.find(x => x.id === selection.id && x.kind === selection.kind);
     if (!furniture) return;
     if (selection.kind === 'archive') setArchiveId(furniture.contentId);

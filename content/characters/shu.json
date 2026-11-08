@@ -21,7 +21,8 @@
     "premultipliedAlpha": true,
     "animations": {
       "idle": "Relax",
-      "interact": "Interact"
+      "interact": "Interact",
+      "move": "Move"
     },
     "verified": true
   },

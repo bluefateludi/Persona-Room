@@ -301,3 +301,27 @@ Hi3d-0765/
 - [01 素材线](.scratch/gallery/issues/01-assets.md)：角色内容包、SpineActor 与主题家具，进度写入 `docs/status/assets.md`。
 - [02 场景线](.scratch/gallery/issues/02-scene.md)：场景、工程入口、依赖管理与最终集成，进度写入 `docs/status/scene.md`。
 - [03 交互线](.scratch/gallery/issues/03-interaction.md)：档案、语音、收藏、布局与配置保存，进度写入 `docs/status/interaction.md`。
+
+
+### 展厅漫游互动（已实现）
+
+保留黍的 2D Spine 小人，在 3D 展厅的地面坐标中移动。复用现成的 `Move` / `Relax` / `Interact` 动作，不需要额外生成模型或调用生成 MCP。
+
+- 点击空地：黍走向目标位置，自动绕开展台、家具和花盆；金色圆环标记目的地。
+- 点击场景中的展品或下方展品目录：黍先走到展品附近，到达后打开对应的档案、语音或画廊面板。
+- 点击小人：停止移动、播放互动动作，并沿用角色语音互动。
+- 途中可以改点另一处地面或展品；点击「停在这里」或按 `Esc` 取消当前行程，不再触发旧目的地内容。
+- 拖动仍然旋转镜头，不触发行走。上方内容面板入口和「检视手办」保留直接访问。
+- 布展后按最新家具位置与缩放重新计算可行走区域；取消旧路线。若家具覆盖了小人的站位，将她移至最近的空地。
+
+实现位置：`frontend/src/scene/navigation.ts` 负责寻路与通行检查，`CompanionProjection.tsx` 负责逐帧移动和屏幕投影，`SpineActor.runtime.ts` 负责走路、待机和朝向。动作名称通过 `content/characters/shu.json` 中的 `spine.animations.move` 配置，缺省时尝试素材内的 `Move`。
+
+当前为 2D 小人在三维地面上漫游；家具避障使用带安全间距的近似占地，暂不支持上下楼梯、复杂地形或逐像素的三维遮挡。漫游站位是当前会话状态，刷新后回到布展设置中的起点。
+
+验证：
+
+```powershell
+node --experimental-strip-types --test frontend/src/scene/navigation.test.mjs frontend/src/features/__tests__/storage.test.mjs
+node scripts/validate-content.mjs
+npm --prefix frontend run build
+```

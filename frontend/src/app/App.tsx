@@ -20,6 +20,8 @@ export function App() {
     character: initialCharacter,
     exhibition: initialExhibition,
   });
+  const [isWalking, setIsWalking] = useState(false);
+  const [visitRequest, setVisitRequest] = useState<{ id: string; sequence: number }>();
   const [selection, onSelect] = useState<Selection>(null);
   const [furnitureOverrides, onLayoutChange] = useState<FurnitureOverrides>({});
   const [contentReady, setContentReady] = useState(false);
@@ -39,7 +41,7 @@ export function App() {
   }, []);
   const props = { ...content, selection, onSelect, furnitureOverrides };
   return (
-    <main className={`gallery-app${selection ? " is-inspecting" : ""}`}>
+    <main className={`gallery-app${selection || isWalking ? " is-inspecting" : ""}`}>
       <header className="masthead">
         <a className="brand" href="./" aria-label="穗间展馆首页">
           <span className="brand-seal">穗</span>
@@ -71,7 +73,9 @@ export function App() {
       {contentResolved ? (
         <GalleryScene
           {...props}
-          companion={
+          visitRequest={visitRequest}
+          onWalkingChange={setIsWalking}
+          companion={(motion) =>
             content.character.spine ? (
               <Suspense
                 fallback={
@@ -80,9 +84,7 @@ export function App() {
               >
                 <SpineActor
                   source={content.character.spine}
-                  onInteract={() =>
-                    onSelect({ id: "shu-companion", kind: "companion" })
-                  }
+                  {...motion}
                 />
               </Suspense>
             ) : (
@@ -102,7 +104,7 @@ export function App() {
           <button
             key={item.id}
             className={selection?.id === item.id ? "active" : ""}
-            onClick={() => onSelect({ id: item.id, kind: item.kind })}
+            onClick={() => setVisitRequest(previous => ({ id: item.id, sequence: (previous?.sequence ?? 0) + 1 }))}
           >
             <span>0{index + 1}</span>
             {item.label}
@@ -111,7 +113,7 @@ export function App() {
         ))}
       </nav>
       {contentResolved && (
-        <GalleryUI {...props} onLayoutChange={onLayoutChange} />
+        <GalleryUI {...props} isWalking={isWalking} onLayoutChange={onLayoutChange} />
       )}
       <footer className="gallery-footer">
         <span>岁丰长相伴 · 黍的互动展馆</span>

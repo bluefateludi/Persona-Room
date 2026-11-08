@@ -19,7 +19,7 @@ const prefix = '/content/assets/shu/';
 const character = {
  schemaVersion:1,id:'shu',name:'黍',intro:'炎国农业天师，曾长期在大荒城研究农业，如今以访客身份暂驻罗德岛。她以耐心照料庄稼，也关心身边每个人的日常生活。',
  model:{url:prefix+'shu-figurine.glb',posterUrl:prefix+'shu-figurine-concept.png',targetHeight:2.5,rotation:[0,0,0]},
- spine:{skeletonUrl:prefix+'spine/build_char_2025_shu.skel',atlasUrl:prefix+'spine/build_char_2025_shu.atlas',textureUrl:prefix+'spine/build_char_2025_shu.png',version:'3.8',premultipliedAlpha:true,animations:{idle:'Relax',interact:'Interact'},verified:true},
+ spine:{skeletonUrl:prefix+'spine/build_char_2025_shu.skel',atlasUrl:prefix+'spine/build_char_2025_shu.atlas',textureUrl:prefix+'spine/build_char_2025_shu.png',version:'3.8',premultipliedAlpha:true,animations:{idle:'Relax',interact:'Interact',move:'Move'},verified:true},
  archives:[
   {id:'profile',title:'客观履历 · 原文节选',text:handbook.storyTextAudio.find(s=>s.storyTitle==='客观履历').stories[0].storyText,source},
   {id:'care',title:'档案资料一 · 展馆导读',text:'她会为年安排健康饮食，提醒夕走出画卷、适度运动。面对其他干员，她同样愿意倾听烦恼、耐心解答；这种细致的照料，让“黍姐”的称呼渐渐亲切起来。\n\n本段为创作者依据游戏档案整理的导读，并非游戏原文。',source},
