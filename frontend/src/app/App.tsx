@@ -1,3 +1,4 @@
+import { GalleryUI } from "../features/GalleryUI";
 import { useEffect, useState } from "react";
 import type {
   FurnitureOverrides,
@@ -15,16 +16,20 @@ export function App() {
     exhibition: initialExhibition,
   });
   const [selection, onSelect] = useState<Selection>(null);
-  const [furnitureOverrides] = useState<FurnitureOverrides>({});
+  const [furnitureOverrides, onLayoutChange] = useState<FurnitureOverrides>({});
   const [contentReady, setContentReady] = useState(false);
+  const [contentResolved, setContentResolved] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     loadContent(controller.signal)
       .then((data) => {
         setContent(data);
         setContentReady(true);
+        setContentResolved(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!controller.signal.aborted) setContentResolved(true);
+      });
     return () => controller.abort();
   }, []);
   const props = { ...content, selection, onSelect, furnitureOverrides };
@@ -72,27 +77,8 @@ export function App() {
           </button>
         ))}
       </nav>
-      {selection && (
-        <aside className="temporary-panel">
-          <button onClick={() => onSelect(null)} aria-label="关闭展品说明">
-            ×
-          </button>
-          <p className="eyebrow">COLLECTION / {selection.kind.toUpperCase()}</p>
-          <h2>
-            {
-              content.exhibition.furniture.find((x) => x.id === selection.id)
-                ?.label
-            }
-          </h2>
-          <p>
-            {selection.kind === "model"
-              ? content.character.intro
-              : "展品入口已接通，详细内容正由对应模块接入。"}
-          </p>
-          {selection.kind === "model" && (
-            <p>拖动场景旋转手办视角，滚轮缩放。点击「全馆视角」返回展厅。</p>
-          )}
-        </aside>
+      {contentResolved && (
+        <GalleryUI {...props} onLayoutChange={onLayoutChange} />
       )}
       <footer className="gallery-footer">
         <span>岁丰长相伴 · 黍的互动展馆</span>
