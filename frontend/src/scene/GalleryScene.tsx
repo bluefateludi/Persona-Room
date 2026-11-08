@@ -1,3 +1,4 @@
+import { SceneBoundary } from "./SceneBoundary";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
@@ -220,54 +221,56 @@ export function GalleryScene(props: SceneProps) {
     : null;
   return (
     <section className="gallery-scene" aria-label="三维互动展厅">
-      <Canvas
-        frameloop="demand"
-        shadows
-        dpr={[1, 1.6]}
-        camera={{ position: [8, 6.8, 10], fov: 40 }}
-        gl={{ antialias: true, alpha: false }}
-        onPointerMissed={() => props.onSelect(null)}
-        fallback={
-          <div className="webgl-fallback">
-            当前设备暂不支持三维展厅，仍可通过下方目录阅读展品。
-          </div>
-        }
-      >
-        <color attach="background" args={["#162b30"]} />
-        <fog attach="fog" args={["#162b30", 18, 35]} />
-        <ambientLight intensity={1.1} />
-        <hemisphereLight args={["#f4ead4", "#243e4c", 1.7]} />
-        <directionalLight
-          position={[3, 9, 5]}
-          intensity={3.5}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-          shadow-camera-left={-9}
-          shadow-camera-right={9}
-          shadow-camera-top={9}
-          shadow-camera-bottom={-9}
-        />
-        <spotLight
-          position={[-3, 7, -1]}
-          intensity={38}
-          angle={0.7}
-          penumbra={1}
-          color="#ffe6b5"
-        />
-        <Room />
-        {props.exhibition.furniture.map((item) => (
-          <Exhibit key={item.id} item={item} props={props} />
-        ))}
-        <ContactShadows
-          position={[0, 0.012, 0]}
-          opacity={0.3}
-          scale={17}
-          blur={2.5}
-          far={5}
-          resolution={512}
-        />
-        <CameraRig focused={focused} reset={reset} />
-      </Canvas>
+      <SceneBoundary>
+        <Canvas
+          frameloop="demand"
+          shadows
+          dpr={[1, 1.6]}
+          camera={{ position: [8, 6.8, 10], fov: 40 }}
+          gl={{ antialias: true, alpha: false }}
+          onPointerMissed={() => props.onSelect(null)}
+          fallback={
+            <div className="webgl-fallback">
+              当前设备暂不支持三维展厅，仍可通过下方目录阅读展品。
+            </div>
+          }
+        >
+          <color attach="background" args={["#162b30"]} />
+          <fog attach="fog" args={["#162b30", 18, 35]} />
+          <ambientLight intensity={1.1} />
+          <hemisphereLight args={["#f4ead4", "#243e4c", 1.7]} />
+          <directionalLight
+            position={[3, 9, 5]}
+            intensity={3.5}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-9}
+            shadow-camera-right={9}
+            shadow-camera-top={9}
+            shadow-camera-bottom={-9}
+          />
+          <spotLight
+            position={[-3, 7, -1]}
+            intensity={38}
+            angle={0.7}
+            penumbra={1}
+            color="#ffe6b5"
+          />
+          <Room />
+          {props.exhibition.furniture.map((item) => (
+            <Exhibit key={item.id} item={item} props={props} />
+          ))}
+          <ContactShadows
+            position={[0, 0.012, 0]}
+            opacity={0.3}
+            scale={17}
+            blur={2.5}
+            far={5}
+            resolution={512}
+          />
+          <CameraRig focused={focused} reset={reset} />
+        </Canvas>
+      </SceneBoundary>
       <LoadingNotice />
       <div className="scene-controls">
         <span>

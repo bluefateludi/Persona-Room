@@ -453,3 +453,9 @@ a {
   display: block;
   max-width: 100%;
 }
+.webgl-fallback button {
+  border: 1px solid #b99a56;
+  background: #233d42;
+  padding: 10px 16px;
+  color: #e8dfcb;
+}
