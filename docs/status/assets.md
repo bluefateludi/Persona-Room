@@ -45,3 +45,8 @@
 - codex mcp login hi3d 返回 Successfully logged in to MCP server 'hi3d'，用户已在浏览器完成 OAuth。
 - 授权后 get_account_context 和 get_capabilities 各调用两次（含明确授权重试），全部返回 HTTP 503 AUTH_SERVICE_UNAVAILABLE。
 - 本聊天可见 11 个 Hi3D 工具，但这不代表当前远程调用可用。尚未恢复运行验证，未发新的收费生成请求。
+
+## 最新 MCP 重试：查询恢复
+- 用户要求继续重试后，get_account_context、get_capabilities、list_tasks 三个真实 MCP 请求均成功。
+- 当前余额 1065；任务列表仍只有原手办，无档案柜新任务。
+- 查询连接已恢复，无需为查询重启客户端；收费生成未重发，原报价仍受工具的一次提交限制。
