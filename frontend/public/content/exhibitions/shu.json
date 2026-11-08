@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "id": "shu-gallery",
+  "characterId": "shu",
+  "title": "黍 · 百谷长青",
+  "furniture": [
+    {
+      "id": "shu-figure",
+      "kind": "model",
+      "label": "黍的数字手办",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "contentId": "shu"
+    },
+    {
+      "id": "shu-companion",
+      "kind": "companion",
+      "label": "与黍互动",
+      "position": [
+        -2.5,
+        0,
+        1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "contentId": "shu"
+    },
+    {
+      "id": "archive-desk",
+      "kind": "archive",
+      "label": "了解她的故事",
+      "position": [
+        -3,
+        0,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "contentId": "profile"
+    },
+    {
+      "id": "voice-station",
+      "kind": "voice",
+      "label": "听她说话",
+      "position": [
+        3,
+        0,
+        -2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "contentId": "shu-assistant"
+    },
+    {
+      "id": "art-frame",
+      "kind": "art",
+      "label": "角色画廊",
+      "position": [
+        0,
+        1.8,
+        -4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "contentId": "shu-art"
+    }
+  ]
+}

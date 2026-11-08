@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "shu",
+  "name": "黍",
+  "intro": "炎国农业天师，曾长期在大荒城研究农业，如今以访客身份暂驻罗德岛。她以耐心照料庄稼，也关心身边每个人的日常生活。",
+  "model": {
+    "url": "/content/assets/shu/shu-figurine.glb",
+    "posterUrl": "/content/assets/shu/shu-figurine-concept.png",
+    "targetHeight": 2.5,
+    "rotation": [
+      0,
+      0,
+      0
+    ]
+  },
+  "spine": {
+    "skeletonUrl": "/content/assets/shu/spine/build_char_2025_shu.skel",
+    "atlasUrl": "/content/assets/shu/spine/build_char_2025_shu.atlas",
+    "textureUrl": "/content/assets/shu/spine/build_char_2025_shu.png",
+    "version": "3.8",
+    "premultipliedAlpha": true,
+    "animations": {
+      "idle": "Relax",
+      "interact": "Interact"
+    },
+    "verified": true
+  },
+  "archives": [
+    {
+      "id": "profile",
+      "title": "客观履历 · 原文节选",
+      "text": "黍，炎国农业天师，天师府授业天师。曾于炎国北部农业基地大荒城从事农业研究多年且已有丰富的科研成果。现因访问亲属，以访客身份暂驻罗德岛。",
+      "source": {
+        "label": "明日方舟游戏档案 · ArknightsGameData",
+        "url": "https://github.com/Kengxxiao/ArknightsGameData/blob/master/zh_CN/gamedata/excel/handbook_info_table.json"
+      }
+    },
+    {
+      "id": "care",
+      "title": "档案资料一 · 展馆导读",
+      "text": "她会为年安排健康饮食，提醒夕走出画卷、适度运动。面对其他干员，她同样愿意倾听烦恼、耐心解答；这种细致的照料，让“黍姐”的称呼渐渐亲切起来。\n\n本段为创作者依据游戏档案整理的导读，并非游戏原文。",
+      "source": {
+        "label": "明日方舟游戏档案 · ArknightsGameData",
+        "url": "https://github.com/Kengxxiao/ArknightsGameData/blob/master/zh_CN/gamedata/excel/handbook_info_table.json"
+      }
+    },
+    {
+      "id": "harvest",
+      "title": "档案资料三 · 展馆导读",
+      "text": "黍关心的不止是粮食产量，也包括食材的品质。农业研究从抵御风霜、提高收成，走向移动城市与无土栽培；她更在意眼前一季庄稼与一餐好饭，把漫长的理想落在踏实的生活里。\n\n本段为创作者依据游戏档案整理的导读，并非游戏原文。",
+      "source": {
+        "label": "明日方舟游戏档案 · ArknightsGameData",
+        "url": "https://github.com/Kengxxiao/ArknightsGameData/blob/master/zh_CN/gamedata/excel/handbook_info_table.json"
+      }
+    }
+  ],
+  "voices": [
+    {
+      "id": "shu-assistant",
+      "title": "任命助理",
+      "text": "博士，阳光与水分都是生长的必要条件，这株盆栽今天已经好好地完成了它的指标，但你好像还没喝够十杯水哦。",
+      "language": "普通话",
+      "audioUrl": "/content/assets/shu/voice/CN_001.wav",
+      "source": {
+        "label": "Ark-Voice 普通话 · CN_001；字幕：ArknightsGameData",
+        "url": "https://github.com/isHarryh/Ark-Voice"
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "id": "shu-art",
+      "title": "黍 · 角色参考",
+      "imageUrl": "/content/assets/shu/shu-reference.png",
+      "description": "用户已有的角色参考图，游戏角色素材版权归原权利人。"
+    },
+    {
+      "id": "shu-figure-art",
+      "title": "数字手办 · 概念参考",
+      "imageUrl": "/content/assets/shu/shu-figurine-concept.png",
+      "description": "AI 生成的手办参考效果图，与实际 3D 手办分别展示。"
+    }
+  ],
+  "story": {
+    "label": "前往文库阅读",
+    "url": "https://terra-library.pages.dev/",
+    "directLinkVerified": false,
+    "searchHint": "黍"
+  }
+}

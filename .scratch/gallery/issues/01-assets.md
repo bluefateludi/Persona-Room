@@ -1,9 +1,9 @@
 # 01 — 可用角色内容与主题家具
-**What to build:** 整理可直接浏览的黍内容包：真实 GLB、可播放 Spine、至少一条可试听语音与字幕、精选档案与文库入口；生成一件主题档案柜 PNG 并取得 3D 报价。
-**Blocked by:** None — can start immediately，契约已落盘。
-**Status:** ready-for-agent
-- [ ] GLB 和 Spine 实际验证，完成 SpineActor 独立播放入口。
-- [ ] 真实语音与字幕匹配，档案标注来源；缺失项目诚实记录。
-- [ ] JSON 符合公共契约，公开白名单资产准备脚本可运行。
-- [ ] 一件主题家具参考图保存；报价与确认状态记录，不擅自提交收费建模。
-- [ ] docs/status/assets.md 给出接入方法和验证证据。
+**What to build:** 真实黍素材、内容包、SpineActor、白名单准备脚本与稻穗档案柜参考图/报价。
+**Status:** implemented; optional furniture 3D blocked by external authorization service
+- [x] 已有 GLB 实际渲染通过；Spine 三件套、真实动画与透明画布播放通过。
+- [x] 普通话 CN_001 实际解码、播放至结束，字幕源映射；精选档案标注原文与导读。
+- [x] 契约内容 JSON、白名单发布与验证脚本可运行。
+- [x] 一件主题家具 PNG 已保存；45 积分报价获用户确认；仅提交一次，HTTP 503，未返回任务、未观察扣费。
+- [x] docs/status/assets.md 和 assets/shu/README.md 含接入方法、证据与限制。
+- [ ] 家具 GLB：收费提交被 Hi3D 授权服务阻断，不能声明生成成功；不自动重试。

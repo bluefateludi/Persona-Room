@@ -15,3 +15,12 @@
 - 独立截图 output/playwright/assets-preview.png；正式证据将落 assets/shu/validation/。
 - 已写 SpineActor.tsx 与 SpineActor.runtime.ts。依赖确认 pixi.js 7.4.3、@pixi-spine/runtime-3.8 4.0.6、@pixi-spine/base 4.0.6（场景线统一加依赖）。
 - 正在收尾：白名单/契约检查、组件 TypeScript 检查、错误路径与清理验证、可交接提交。
+
+## 已可交接（2026-11-08 13:00，香港时间）
+- 素材内容、SpineActor、准备与校验脚本已完成；场景线可合并 codex/assets 本线提交。
+- 接入：`node scripts/prepare-assets.mjs` → `node scripts/validate-content.mjs`；内容读取 /content/characters/shu.json 与 /content/exhibitions/shu.json；SpineActor 导出符合固定契约。
+- 独立预览：场景依赖就绪后 `node scripts/serve-asset-preview.mjs` → http://127.0.0.1:5188/scripts/asset-preview.html 。
+- 严格 TypeScript 检查通过；React StrictMode 仅一张画布，卸载为零，点击回调、404 提示及切回有效源后恢复通过。白名单的非授权 JSON 拒绝检查通过。
+- 最终证据：assets/shu/validation/assets-preview.png 与 report.json；完整来源和生成 PNG 提示词见 assets/shu/README.md。
+- 仍缺：主题档案柜 GLB（授权服务 503，已确认报价只提交一次，无任务、无扣费），文库角色直达链接、人工听感验收、移动设备集成性能验证。可运行首版使用程序化档案柜。
+- Hi3D 本会话已 OAuth 登录，账户查询正常，1065 积分；收费接口存在间歇授权服务故障，不自动重试。其他工作树不要重复提交。
